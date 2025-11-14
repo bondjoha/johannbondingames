@@ -1,0 +1,166 @@
+
+/* Background styling */
+/* Background styling */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* allow content to start from top */
+  position: relative;
+  overflow-y: auto; /* enable vertical scrolling */
+  padding: 2rem 0; /* optional top/bottom spacing */
+}
+
+/* Overlay background remains the same */
+.overlay {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+              url('background.jpg') 
+              no-repeat center center;
+  background-size: cover;
+  z-index: -1;
+  filter: brightness(0.8);
+  animation: bgZoom 20s ease-in-out infinite;
+}
+
+/* Optional subtle zoom animation */
+@keyframes bgZoom 
+{
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Header styling                   */
+h1 
+{
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 2px 2px 15px rgba(0,0,0,0.7);
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+/* Login card */
+.login-card
+ {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+}
+
+
+/* Form input fields */
+.form-control 
+{
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+/* Icon inside input */
+.position-relative i 
+{
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.form-control.ps-5 
+{
+  padding-left: 40px;
+}
+
+
+/* Button styling */
+.btn-primary 
+{
+  background: linear-gradient(90deg, #1d4ed8, #2563eb);
+  border: none;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  padding: 0.75rem;
+}
+
+.btn-primary:hover 
+{
+  background: linear-gradient(90deg, #1e40af, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
+}
+
+/* Register link*/
+.register-link a 
+{
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-link a:hover 
+{
+  text-decoration: underline;
+}
+
+/***************** Add_Read_Update_Delete_HotelsDetails ***************/
+/* Hover effect for text-like links */
+.nav-link-hover:hover 
+{
+    color: #ffd700 !important; /* gold color on hover */
+    text-decoration: underline;
+}
+
+.hotel-header {
+    background: linear-gradient(90deg, #1e3c72, #2a5298); /* gradient */
+    color: white;
+    padding: 40px 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    font-family: 'Segoe UI', sans-serif;
+}
+.hotel-header h1 {
+    font-size: 3rem;
+    margin: 0;
+}
+
+
+/* Responsive adjustments*/
+@media (max-width: 420px) 
+{
+  .login-card 
+  {
+    padding: 1.5rem;
+    margin: 0 10px;
+  }
+
+  .form-control 
+  {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .btn-primary 
+  {
+    padding: 0.6rem;
+  }
+
+  h1 
+  {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+}
