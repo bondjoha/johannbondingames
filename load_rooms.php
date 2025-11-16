@@ -1,7 +1,7 @@
 <?php
 include('databaseconnect.php');
 
-// Get the hotel ID 
+// Get hotel ID 
 $hotelId = $_POST['hotel_id'] ?? null;
 if (!$hotelId) 
 {
@@ -17,7 +17,7 @@ function getRoomImages($room)
 
 try 
 {
-    // Obtsin all rooms for the choosen hotel that can be booked
+    // Obtain all rooms for the choosen hotel that can be booked
     $stmt = $conn->prepare
     ("
         SELECT Room_Type, Image1, Image2, Image3, Bed_Type, Price, Room_Square_Meter
@@ -37,7 +37,6 @@ try
     echo "<div class='container mt-4'><div class='row g-4'>";
     $types = array_unique(array_column($rooms, 'Room_Type'));
 
-    // attach images to rooms
     foreach ($types as $type) 
     {
         $typeRooms = array_filter($rooms, fn($r) => $r['Room_Type'] === $type);
@@ -52,7 +51,6 @@ try
         $allImages = array_unique($allImages);
         $imgPath = !empty($allImages) ? $allImages[array_rand($allImages)] : 'images/rooms/default.jpg';
 
-        // display a random room in the modal for publicity
         $room = $typeRooms[array_rand($typeRooms)];
 
         echo "<div class='col-md-4'>";
@@ -72,10 +70,8 @@ try
 } 
 catch (PDOException $e) 
 {
-    // Display error message
     echo "<p class='text-danger'>Error fetching rooms: " . $e->getMessage() . "</p>";
 }
 
-// Close the database connection
 $conn = null;
 ?>
