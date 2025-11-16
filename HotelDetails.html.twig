@@ -46,7 +46,9 @@
         <div class="col-md-4"><input type="email" class="form-control" name="Email" placeholder="Hotel Email"></div>
         <div class="col-md-4"><input type="number" class="form-control" name="Star_Rating" placeholder="Star Rating (1–5)" min="1" max="5"></div>
         <div class="col-md-4"><input type="number" class="form-control" name="Number_of_Rooms" placeholder="Number of Rooms" min="1"></div>
-        <div class="col-md-12"><input type="text" class="form-control" name="Hotel_Image" placeholder="Hotel Image URL (optional)"></div>
+        <div class="col-md-4"><input type="text" class="form-control" name="Hotel_Image" placeholder="Hotel Image 1 URL"></div>
+        <div class="col-md-4"><input type="text" class="form-control" name="Hotel_Image2" placeholder="Hotel Image 2 URL"></div>
+        <div class="col-md-4"><input type="text" class="form-control" name="Hotel_Image3" placeholder="Hotel Image 3 URL"></div>
         <div class="col-12">
           <button type="submit" name="submitHotelRecord" class="btn btn-success">Add Hotel Record</button>
         </div>
@@ -81,99 +83,50 @@
     </div>
   </form>
 
-  <script>
-    // Prepare a JS map of countries => cities
-    const countryCityMap = {
-      {% for country in countries %}
-        "{{ country }}": [
-          {% for row in hotels if row.Hotel_Country_Name == country %}
-            "{{ row.Hotel_City_Name }}"{% if not loop.last %}, {% endif %}
-          {% endfor %}
-        ]{% if not loop.last %}, {% endif %}
-      {% endfor %}
-    };
-
-    const countrySelect = document.getElementById('country');
-    const citySelect = document.getElementById('city');
-
-    countrySelect.addEventListener('change', function() {
-      const selectedCountry = this.value;
-      // Clear city options
-      citySelect.innerHTML = '<option value="">All Cities</option>';
-
-      if (selectedCountry && countryCityMap[selectedCountry]) {
-        const cities = [...new Set(countryCityMap[selectedCountry])]; // remove duplicates
-        cities.sort(); // optional: sort alphabetically
-        cities.forEach(city => {
-          const option = document.createElement('option');
-          option.value = city;
-          option.textContent = city;
-          citySelect.appendChild(option);
-        });
-      }
-    });
-  </script>
-
-
-
   <!-- Hotel List -->
   <div class="row g-3">
     {% if hotels|length > 0 %}
       {% for row in hotels %}
         <div class="col-md-4">
           <div class="card h-100">
-            {% if row.Hotel_Image %}
-              <img src="{{ row.Hotel_Image|e }}" class="card-img-top" alt="{{ row.Hotel_Name|e }}" style="height:200px; object-fit:cover;">
+            {% set images = [row.Hotel_Image, row.Hotel_Image2, row.Hotel_Image3]|filter(v => v) %}
+            {% if images|length > 0 %}
+              {% if images|length > 1 %}
+                <div id="carousel{{ row.Hotel_Id }}" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    {% for img in images %}
+                      <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <img src="{{ img|e }}" class="d-block w-100" style="height:200px; object-fit:cover;" alt="{{ row.Hotel_Name|e }}">
+                      </div>
+                    {% endfor %}
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ row.Hotel_Id }}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ row.Hotel_Id }}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
+                </div>
+              {% else %}
+                <img src="{{ images[0]|e }}" class="card-img-top" style="height:200px; object-fit:cover;" alt="{{ row.Hotel_Name|e }}">
+              {% endif %}
             {% endif %}
-            
+
             <div class="card-body">
               <form method="POST">
-                <h5 class="card-title">
-                <label class="form-label fw-bold">Hotel Name</label>
-                <input type="text" class="form-control mb-2" name="Hotel_Name" value="{{ row.Hotel_Name|e }}">
-            </h5>
-
-            <p class="card-text">
-                <div class="mb-2">
-                    <label class="form-label fw-bold">Street Name</label>
-                    <input type="text" class="form-control" name="Hotel_Street_Name" value="{{ row.Hotel_Street_Name|e }}">
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label fw-bold">City</label>
-                    <input type="text" class="form-control" name="Hotel_City_Name" value="{{ row.Hotel_City_Name|e }}">
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label fw-bold">Country</label>
-                    <input type="text" class="form-control" name="Hotel_Country_Name" value="{{ row.Hotel_Country_Name|e }}">
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label fw-bold">Phone Number</label>
-                    <input type="text" class="form-control" name="Phone_Number" value="{{ row.Phone_Number|e }}" placeholder="Phone Number">
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label fw-bold">Email</label>
-                    <input type="email" class="form-control" name="Email" value="{{ row.Email|e }}" placeholder="Hotel Email">
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label fw-bold">Star Rating</label>
-                    <input type="number" class="form-control" name="Star_Rating" value="{{ row.Star_Rating|e }}" min="1" max="5">
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label fw-bold">Number of Rooms</label>
-                    <input type="number" class="form-control" name="Number_of_Rooms" value="{{ row.Number_of_Rooms|e }}" min="1">
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label fw-bold">Hotel Image URL</label>
-                    <input type="text" class="form-control" name="Hotel_Image" value="{{ row.Hotel_Image|e }}" placeholder="Hotel Image URL">
-                </div>
-            </p>
+                <div class="mb-2"><label class="form-label fw-bold">Hotel Name</label><input type="text" class="form-control" name="Hotel_Name" value="{{ row.Hotel_Name|e }}"></div>
+                <div class="mb-2"><label class="form-label fw-bold">Street Name</label><input type="text" class="form-control" name="Hotel_Street_Name" value="{{ row.Hotel_Street_Name|e }}"></div>
+                <div class="mb-2"><label class="form-label fw-bold">City</label><input type="text" class="form-control" name="Hotel_City_Name" value="{{ row.Hotel_City_Name|e }}"></div>
+                <div class="mb-2"><label class="form-label fw-bold">Country</label><input type="text" class="form-control" name="Hotel_Country_Name" value="{{ row.Hotel_Country_Name|e }}"></div>
+                <div class="mb-2"><label class="form-label fw-bold">Phone Number</label><input type="text" class="form-control" name="Phone_Number" value="{{ row.Phone_Number|e }}"></div>
+                <div class="mb-2"><label class="form-label fw-bold">Email</label><input type="email" class="form-control" name="Email" value="{{ row.Email|e }}"></div>
+                <div class="mb-2"><label class="form-label fw-bold">Star Rating</label><input type="number" class="form-control" name="Star_Rating" value="{{ row.Star_Rating|e }}" min="1" max="5"></div>
+                <div class="mb-2"><label class="form-label fw-bold">Number of Rooms</label><input type="number" class="form-control" name="Number_of_Rooms" value="{{ row.Number_of_Rooms|e }}" min="1"></div>
+                <div class="mb-2"><label class="form-label fw-bold">Hotel Image 1 URL</label><input type="text" class="form-control" name="Hotel_Image" value="{{ row.Hotel_Image|e }}"></div>
+                <div class="mb-2"><label class="form-label fw-bold">Hotel Image 2 URL</label><input type="text" class="form-control" name="Hotel_Image2" value="{{ row.Hotel_Image2|e }}"></div>
+                <div class="mb-2"><label class="form-label fw-bold">Hotel Image 3 URL</label><input type="text" class="form-control" name="Hotel_Image3" value="{{ row.Hotel_Image3|e }}"></div>
 
                 <input type="hidden" name="Hotel_Id" value="{{ row.Hotel_Id|e }}">
                 <div class="d-flex justify-content-between mt-3">
