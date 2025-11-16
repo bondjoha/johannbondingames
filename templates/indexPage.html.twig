@@ -4,52 +4,17 @@
     <title>Hotel Booking</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-
-    <!-- PAGE-SPECIFIC CSS -->
-    <style>
-        /* Hero section with subtle overlay for better text readability */
-        .hero {
-    width: 100vw;           /* full viewport width */
-    height: 300px;          /* taller for full impact */
-    background: url('images/background3.jpg') center center no-repeat;
-    background-size: cover;  /* ensures it covers full div */
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.hero::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);  /* semi-transparent overlay for contrast */
-}
-
-        /* Uniform hotel card images */
-        .hotel-card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-
-        /* Cards stretch properly inside flex column */
-        .hotel-card {
-            display: flex;
-            flex-direction: column;
-        }
-    </style>
 </head>
+
 <body class="bg-light">
 
+<!-- Header text displayed in the image -->
 <div class="hero mb-4 d-flex flex-column justify-content-center align-items-center text-center">
-    <h1>Find Your Perfect Stay</h1>
-    <h1>Luxury hotels, resorts, and unforgettable experiences</h1>
+    <h1 class="hero-title">Hotel Booking</h1>
+    <h2 class="hero-subtitle">Luxury hotels with unforgettable experiences</h2>
 </div>
 
-
-
+<!-- Text field to searcj hotels and rooms -->
 <div class="container">
 <form method="POST" class="row g-3 mb-4" id="searchForm">
     <div class="col-md-3">
@@ -64,9 +29,15 @@
         <label>Country</label>
         <select name="country" class="form-control" id="countrySelect">
             <option value="">All Countries</option>
+            <!-- creating drop down list from availiable countries inside database -->
             {% for c in countries %}
-                <option value="{{ c.Hotel_Country_Name }}" {% if country == c.Hotel_Country_Name %}selected{% endif %}>
-                    {{ c.Hotel_Country_Name }}
+                <!-- keeps the previous selected country visible -->
+                <option value="{{ c.Hotel_Country_Name }}" 
+                {% if country == c.Hotel_Country_Name %}
+                selected
+                {% endif %}>
+                <!-- display countryy in the dropdown -->
+                {{ c.Hotel_Country_Name }} 
                 </option>
             {% endfor %}
         </select>
@@ -75,23 +46,30 @@
         <label>City</label>
         <select name="city" class="form-control" id="citySelect">
             <option value="">All Cities</option>
+             <!-- creating drop down list from availiable cities according to country inside database -->
             {% for c in cities %}
-                <option value="{{ c.Hotel_City_Name }}" {% if city == c.Hotel_City_Name %}selected{% endif %}>
-                    {{ c.Hotel_City_Name }}
+                <option value="{{ c.Hotel_City_Name }}" 
+                {% if city == c.Hotel_City_Name %}
+                selected
+                {% endif %}>
+                {{ c.Hotel_City_Name }}
                 </option>
             {% endfor %}
         </select>
     </div>
+    <!-- button to search -->
     <div class="col-md-12">
         <button class="btn btn-primary">Search</button>
     </div>
 </form>
 
+<!-- displar error message if text fiels is left empty-->
 <div class="row g-4">
 {% if hotels is empty %}
     <p class="text-center">No hotels found.</p>
 {% endif %}
 
+<!-- creating hotel cards with carousel, hotel detaild and view rooms details button -->
 {% for hotel in hotels %}
     {% set himgs = [hotel.Hotel_Image, hotel.Hotel_Image2, hotel.Hotel_Image3]|filter(v => v) %}
     <div class="col-md-4">
@@ -117,7 +95,8 @@
                 {% endif %}
             </div>
             {% endif %}
-            <button class="btn btn-primary mt-auto view-details-btn"
+            <!-- button that triggers modal through javascript with class ViewDetailsButton-->
+            <button class="btn btn-primary mt-auto ViewDetailsButton"
                     data-hotel-id="{{ hotel.Hotel_Id }}"
                     data-hotel-name="{{ hotel.Hotel_Name }}">
                 View Rooms
@@ -128,6 +107,7 @@
 </div>
 </div>
 
+<!-- display modal with hotel rooms details and images -->
 <div class="modal fade" id="roomsModal">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
