@@ -1,7 +1,6 @@
-
-/* Background styling */
-/* Background styling */
-body {
+/* general stle */
+body 
+{
   margin: 0;
   padding: 0;
   font-family: 'Poppins', sans-serif;
@@ -9,49 +8,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* allow content to start from top */
+  justify-content: flex-start;
   position: relative;
-  overflow-y: auto; /* enable vertical scrolling */
-  padding: 2rem 0; /* optional top/bottom spacing */
-}
-
-/* Overlay background remains the same */
-.overlay {
-  position: fixed;
-  top: 0; 
-  left: 0;
-  width: 100%; 
-  height: 100%;
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-              url('background.jpg') 
-              no-repeat center center;
-  background-size: cover;
-  z-index: -1;
-  filter: brightness(0.8);
-  animation: bgZoom 20s ease-in-out infinite;
-}
-
-/* Optional subtle zoom animation */
-@keyframes bgZoom 
-{
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-/* Header styling                   */
-h1 
-{
-  color: #fff;
-  font-weight: 700;
-  text-shadow: 2px 2px 15px rgba(0,0,0,0.7);
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
+  overflow-y: auto;
+  padding: 2rem 0;
 }
 
 /* Login card */
-.login-card
- {
+.login-card 
+{
   background-color: rgba(255, 255, 255, 0.9);
   border-radius: 1rem;
   padding: 2rem;
@@ -61,7 +26,6 @@ h1
   backdrop-filter: blur(8px);
 }
 
-
 /* Form input fields */
 .form-control 
 {
@@ -70,23 +34,12 @@ h1
   font-size: 1rem;
 }
 
-/* Icon inside input */
-.position-relative i 
-{
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #888;
-}
-
 .form-control.ps-5 
 {
   padding-left: 40px;
 }
 
-
-/* Button styling */
+/* Buttons */
 .btn-primary 
 {
   background: linear-gradient(90deg, #1d4ed8, #2563eb);
@@ -104,7 +57,7 @@ h1
   box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
 }
 
-/* Register link*/
+/* Register link */
 .register-link a 
 {
   color: #1d4ed8;
@@ -117,29 +70,77 @@ h1
   text-decoration: underline;
 }
 
-/***************** Add_Read_Update_Delete_HotelsDetails ***************/
-/* Hover effect for text-like links */
+/* Nav link hover */
 .nav-link-hover:hover 
 {
-    color: #ffd700 !important; /* gold color on hover */
-    text-decoration: underline;
+  color: #ffd700 !important;
+  text-decoration: underline;
 }
 
-.hotel-header {
-    background: linear-gradient(90deg, #1e3c72, #2a5298); /* gradient */
-    color: white;
-    padding: 40px 0;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    border-radius: 10px;
-    font-family: 'Segoe UI', sans-serif;
-}
-.hotel-header h1 {
-    font-size: 3rem;
-    margin: 0;
+/* Hotel header */
+.hotel-header 
+{
+  background: linear-gradient(90deg, #1e3c72, #2a5298);
+  color: white;
+  padding: 40px 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  font-family: 'Segoe UI', sans-serif;
 }
 
+.hotel-header h1 
+{
+  font-size: 3rem;
+  margin: 0;
+}
 
-/* Responsive adjustments*/
+/* index page html css */
+.hero 
+{
+    width: 100vw;                 
+    height: 300px;                
+    background: url('images/background3.jpg') center center no-repeat;
+    background-size: cover;      
+    position: relative;
+    display: flex;
+    flex-direction: column;       
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    color: #FFD700;               
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7), 0 0 10px rgba(0,0,0,0.5);
+    font-weight: bold;             
+    padding: 0 1rem;
+}
+
+.hero h1, .hero h2 
+{
+    font-weight: bold;
+    margin: 0.2rem 0;
+}
+
+.hero h1 { font-size: 3rem; }
+.hero h2 { font-size: 1.8rem; }
+
+.hero::after 
+{
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 1;
+}
+
+.hero h1, .hero h2 { position: relative; z-index: 2; }
+
+/* HOTEL CARDS */
+.hotel-card img { width: 100%; height: 180px; object-fit: cover; }
+.hotel-card { display: flex; flex-direction: column; }
+
+
+/* Responsive adjustments */
 @media (max-width: 420px) 
 {
   .login-card 
