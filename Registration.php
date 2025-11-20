@@ -12,7 +12,8 @@ $twig = new Environment($loader);
 $message = "";
 
 // Handle form submission
-if (isset($_POST['submit'])) {
+if (isset($_POST['submit'])) 
+{
     $first_name = trim($_POST['first_name']);
     $last_name = trim($_POST['last_name']);
     $user_email = trim($_POST['user_email']);
@@ -25,17 +26,21 @@ if (isset($_POST['submit'])) {
     {
         $user_password = password_hash($user_password, PASSWORD_DEFAULT);
 
-        try {
+        try 
+        {
             $stmt = $conn->prepare("INSERT INTO logincredentials 
                 (first_name, last_name, user_email, user_password, user_role, phone_number) 
                 VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([$first_name, $last_name, $user_email, $user_password, $user_role, $phone_number]);
 
             $message = "Registration successful! You can now <a href='LoginPage.php'>sign in</a>.";
-        } catch (PDOException $e) {
+        } catch (PDOException $e) 
+        {
             $message = "Error: " . $e->getMessage();
         }
-    } else {
+    } 
+    else 
+    {
         $message = "Passwords do not match.";
     }
 }
@@ -43,6 +48,7 @@ if (isset($_POST['submit'])) {
 $conn = null;
 
 // Render Twig template
-echo $twig->render('registerpage.html.twig', [
+echo $twig->render('registerpage.html.twig', 
+[
     'message' => $message
 ]);

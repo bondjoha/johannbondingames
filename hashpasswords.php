@@ -6,9 +6,11 @@ $sql = "SELECT UserName, UserPassword FROM logincredentials";
 $stmt = $conn->query($sql);
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-foreach ($users as $user) {
-    // Skip already hashed passwords (optional)
-    if (password_get_info($user['UserPassword'])['algo'] !== 0) {
+foreach ($users as $user) 
+    {
+    // Skip already hashed passwords 
+    if (password_get_info($user['UserPassword'])['algo'] !== 0) 
+    {
         continue;
     }
 
@@ -17,7 +19,8 @@ foreach ($users as $user) {
 
     // Update the password in the database
     $update = $conn->prepare("UPDATE logincredentials SET UserPassword = :password WHERE UserName = :username");
-    $update->execute([
+    $update->execute
+    ([
         'password' => $hashedPassword,
         'username' => $user['UserName']
     ]);

@@ -1,167 +1,204 @@
-/* general stle */
-body 
-{
-  margin: 0;
-  padding: 0;
-  font-family: 'Poppins', sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-  overflow-y: auto;
-  padding: 2rem 0;
+/* ====================================================
+   BOOKING CONFIRMATION PAGE STYLES
+   Scoped under .booking-confirmation-page
+==================================================== */
+
+/* ----------------------------------------------------
+   BODY & PAGE HEADER
+---------------------------------------------------- */
+.booking-confirmation-page {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f5f5f5;
+    min-height: 100vh;
+    padding-bottom: 2rem;
 }
 
-/* Login card */
-.login-card 
-{
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 1rem;
-  padding: 2rem;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  backdrop-filter: blur(8px);
-}
-
-/* Form input fields */
-.form-control 
-{
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  font-size: 1rem;
-}
-
-.form-control.ps-5 
-{
-  padding-left: 40px;
-}
-
-/* Buttons */
-.btn-primary 
-{
-  background: linear-gradient(90deg, #1d4ed8, #2563eb);
-  border: none;
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  font-weight: 600;
-  padding: 0.75rem;
-}
-
-.btn-primary:hover 
-{
-  background: linear-gradient(90deg, #1e40af, #1d4ed8);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
-}
-
-/* Register link */
-.register-link a 
-{
-  color: #1d4ed8;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.register-link a:hover 
-{
-  text-decoration: underline;
-}
-
-/* Nav link hover */
-.nav-link-hover:hover 
-{
-  color: #ffd700 !important;
-  text-decoration: underline;
-}
-
-/* Hotel header */
-.hotel-header 
-{
-  background: linear-gradient(90deg, #1e3c72, #2a5298);
-  color: white;
-  padding: 40px 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  border-radius: 10px;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.hotel-header h1 
-{
-  font-size: 3rem;
-  margin: 0;
-}
-
-/* index page html css */
-.hero 
-{
-    width: 100vw;                 
-    height: 300px;                
-    background: url('images/background3.jpg') center center no-repeat;
-    background-size: cover;      
-    position: relative;
-    display: flex;
-    flex-direction: column;       
-    align-items: center;
-    justify-content: center;
+.booking-confirmation-page .page-header {
+    background: #d4af37; /* Gold color */
+    color: #ffffff;
     text-align: center;
-
-    color: #FFD700;               
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.7), 0 0 10px rgba(0,0,0,0.5);
-    font-weight: bold;             
-    padding: 0 1rem;
+    padding: 3rem 1rem;
+    margin-bottom: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-.hero h1, .hero h2 
-{
-    font-weight: bold;
-    margin: 0.2rem 0;
-}
-
-.hero h1 { font-size: 3rem; }
-.hero h2 { font-size: 1.8rem; }
-
-.hero::after 
-{
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);
-    z-index: 1;
-}
-
-.hero h1, .hero h2 { position: relative; z-index: 2; }
-
-/* HOTEL CARDS */
-.hotel-card img { width: 100%; height: 180px; object-fit: cover; }
-.hotel-card { display: flex; flex-direction: column; }
-
-
-/* Responsive adjustments */
-@media (max-width: 420px) 
-{
-  .login-card 
-  {
-    padding: 1.5rem;
-    margin: 0 10px;
-  }
-
-  .form-control 
-  {
-    padding: 0.6rem 0.8rem;
-  }
-
-  .btn-primary 
-  {
-    padding: 0.6rem;
-  }
-
-  h1 
-  {
+.booking-confirmation-page .page-header h2 {
     font-size: 2rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+}
+
+
+/* ----------------------------------------------------
+   NAVBAR
+---------------------------------------------------- */
+.booking-confirmation-page .navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #ffffff;
+    padding: 0.5rem 1rem;
+}
+
+.booking-confirmation-page .navbar .btn-outline-primary {
+    border-radius: 0.5rem;
+    border-color: #d4af37;
+    color: #d4af37;
+    transition: 0.3s all;
+}
+
+.booking-confirmation-page .navbar .btn-outline-primary:hover {
+    background: #d4af37;
+    color: #ffffff;
+}
+
+.booking-confirmation-page .navbar .btn.active {
+    background: #d4af37;
+    color: #ffffff;
+}
+
+/* ----------------------------------------------------
+   HOTEL & ROOM CARDS
+---------------------------------------------------- */
+.booking-confirmation-page .hotel-room-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.booking-confirmation-page .hotel-room-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.booking-confirmation-page .card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.booking-confirmation-page .hotel-carousel,
+.booking-confirmation-page .room-carousel {
+    height: 250px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.booking-confirmation-page .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.booking-confirmation-page .carousel-control-prev-icon,
+.booking-confirmation-page .carousel-control-next-icon {
+    filter: invert(1);
+}
+
+/* ----------------------------------------------------
+   BOOKING FORM CARD
+---------------------------------------------------- */
+.booking-confirmation-page .booking-form-card {
+    max-width: 600px;
+    width: 100%;
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    margin: 2rem auto;
+}
+
+.booking-confirmation-page .booking-form-card h4 {
+    font-weight: 600;
     margin-bottom: 1.5rem;
-  }
+    text-align: center;
+    color: #4a4a4a;
+}
+
+/* ----------------------------------------------------
+   FORM INPUTS
+---------------------------------------------------- */
+.booking-confirmation-page .form-control {
+    border-radius: 0.5rem;
+    border: 1px solid #e0d8b0;
+    transition: 0.3s all;
+}
+
+.booking-confirmation-page .form-control:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 0.2rem rgba(212,175,55,0.25);
+}
+
+/* ----------------------------------------------------
+   BUTTONS
+---------------------------------------------------- */
+.booking-confirmation-page .btn-primary {
+    border-radius: 0.5rem;
+    background: #d4af37;
+    border: none;
+    color: #ffffff;
+    font-weight: 600;
+    transition: 0.3s all;
+}
+
+.booking-confirmation-page .btn-primary:hover {
+    background: #bfa243;
+}
+
+.booking-confirmation-page .btn-danger {
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.booking-confirmation-page .d-flex-center-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* ----------------------------------------------------
+   TEXT
+---------------------------------------------------- */
+.booking-confirmation-page .text-gold {
+    color: #d4af37;
+}
+
+.booking-confirmation-page .card-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.booking-confirmation-page .card-subtitle {
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+.booking-confirmation-page .card-text {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ----------------------------------------------------
+   RESPONSIVE
+---------------------------------------------------- */
+@media (max-width: 768px) {
+    .booking-confirmation-page .page-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .booking-confirmation-page .hotel-carousel,
+    .booking-confirmation-page .room-carousel {
+        height: 180px;
+    }
+}
+
+@media (max-width: 420px) {
+    .booking-confirmation-page .hotel-carousel,
+    .booking-confirmation-page .room-carousel {
+        height: 140px;
+    }
 }

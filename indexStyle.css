@@ -1,0 +1,259 @@
+/*  INDEX PAGE STYLES */
+.index-page 
+{
+    font-family: 'Segoe UI', sans-serif;
+    background: #f5f5f5; /* same as booking page background */
+    color: #000;          /* default text color (gold will be applied selectively) */
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+/* HEADER */
+.index-page .indexheader 
+{
+    background: #d4af37; /* gold like booking page header */
+    color: #ffffff;
+    text-align: center;
+    padding: 3rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.index-page .indexheader-title 
+{
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+}
+
+.index-page .indexheader-subtitle 
+{
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+/* Navigation */
+.index-page .navbar 
+{
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #ffffff; /* same as booking page navbar */
+    padding: 0.5rem 1rem;
+}
+
+.index-page .navbar .btn-outline-primary 
+{
+    border-radius: 0.5rem;
+    border-color: #d4af37;
+    color: #d4af37;
+    transition: 0.3s all;
+}
+
+.index-page .navbar .btn-outline-primary:hover 
+{
+    background: #d4af37;
+    color: #ffffff;
+}
+
+.index-page .navbar .nav-link.fw-bold.text-gold 
+{
+    color: #d4af37 !important;
+}
+
+.index-page .navbar .nav-link.fw-bold.text-gold:hover 
+{
+    text-decoration: underline;
+}
+
+/* SEARCH BAR */
+.index-page .search-wrapper 
+{
+    background: #ffffff;  /* match booking form/card backgrounds */
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+
+.index-page .search-wrapper .form-control,
+.index-page .search-wrapper .form-select 
+{
+    border-radius: 0.5rem;
+    border: 1px solid #e0d8b0;
+    transition: 0.3s all;
+    color: #333; 
+}
+
+.index-page .search-wrapper .form-control:focus,
+.index-page .search-wrapper .form-select:focus 
+{
+    border-color: #d4af37;
+    box-shadow: 0 0 0 0.2rem rgba(212,175,55,0.25);
+}
+
+.index-page .search-wrapper button.btn-primary 
+{
+    border-radius: 0.5rem;
+    background: #d4af37;  /* gold */
+    border: none;
+    color: #ffffff;
+    font-weight: 600;
+    transition: 0.3s all;
+}
+
+.index-page .search-wrapper button.btn-primary:hover 
+{
+    background: #bfa243; /* darker gold */
+}
+
+/* HOTEL CARDS */
+.index-page .card 
+{
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #ffffff; /* match booking card background */
+    color: #000;         /* default text color */
+}
+
+.index-page .card:hover 
+{
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.index-page .card-body 
+{
+    padding: 1rem;
+    flex-grow: 1;
+}
+
+.index-page .hotel-img 
+{
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.index-page .card-title 
+{
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.index-page .card-text 
+{
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.index-page .text-gold 
+{
+    color: #d4af37;
+}
+
+/* VIEW ROOMS BUTTONS */
+.index-page .ViewDetailsButton 
+{
+    border-radius: 0.5rem;
+    background: #d4af37; /* gold background */
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    transition: 0.3s all;
+}
+
+.index-page .ViewDetailsButton:hover 
+{
+    background: #bfa243; /* darker gold hover */
+    color: #ffffff;
+}
+
+/* CAROUSELS  */
+.index-page .carousel-item img 
+{
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.index-page .carousel-control-prev-icon,
+.index-page .carousel-control-next-icon 
+{
+    filter: invert(1);
+}
+
+/* MODALS */
+.index-page .modal-content 
+{
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #ffffff; /* same as booking modal */
+    color: #000;
+}
+
+.index-page .modal-body 
+{
+    padding: 1rem;
+}
+
+/* Modal buttons */
+.index-page .modal-content .btn,
+.index-page .modal-content .btn-primary,
+.index-page .modal-content .btn-outline-primary 
+{
+    border-radius: 0.5rem;
+    background: #d4af37; /* gold background */
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    transition: 0.3s all;
+}
+
+.index-page .modal-content .btn:hover,
+.index-page .modal-content .btn-primary:hover,
+.index-page .modal-content .btn-outline-primary:hover 
+{
+    background: #bfa243; /* darker gold hover */
+    color: #ffffff;
+}
+
+.index-page .modal-content .btn-close 
+{
+    filter: invert(0.7); /* makes the close button more visible */
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 768px) 
+{
+    .index-page .hotel-img,
+    .index-page .carousel-item img 
+    {
+        height: 150px;
+    }
+
+    .index-page .indexheader-title 
+    {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 420px) 
+{
+    .index-page .hotel-img,
+    .index-page .carousel-item img 
+    {
+        height: 120px;
+    }
+
+    .index-page .indexheader-title 
+    {
+        font-size: 1.5rem;
+    }
+}

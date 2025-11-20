@@ -4,27 +4,26 @@ session_start();
 $message = null;
 $error = null;
 
-// Ensure user is logged in and is admin
-if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) 
-{
-    header('Location: Login.php');
-    exit;
-}
-if (!isset($_SESSION['user_role']) || strtolower($_SESSION['user_role']) !== 'admin') 
+if (!isset($_SESSION['user'])) 
 {
     header('Location: Login.php');
     exit;
 }
 
-// Twig & Database
-require_once __DIR__ . '/vendor/autoload.php';
-require_once 'databaseconnect.php';
+if (!isset($_SESSION['user']['role']) || strtolower($_SESSION['user']['role']) !== 'admin') 
+{
+    header('Location: Login.php');
+    exit;
+}
 
+// Setting of twig and database
+include __DIR__ . '/vendor/autoload.php';
+include 'databaseconnect.php';
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
-
 $loader = new FilesystemLoader(__DIR__ . '/templates');
 $twig = new Environment($loader, []);
+
 
 // Add new hotel
 if (isset($_POST['submitHotelRecord'])) 

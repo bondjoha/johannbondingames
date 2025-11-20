@@ -1,8 +1,8 @@
 <?php
 session_start();
-include('databaseconnect.php'); // PDO $conn
-
-require_once 'vendor/autoload.php';
+include('databaseconnect.php'); // PDO connection
+// twig setup
+include 'vendor/autoload.php'; 
 $loader = new \Twig\Loader\FilesystemLoader('templates');
 $twig = new \Twig\Environment($loader);
 
@@ -19,15 +19,26 @@ $stmtUser = $conn->prepare("SELECT user_id AS CredentialsID, first_name, last_na
 $stmtUser->execute([$useremail]);
 $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
-// Fetch all active hotels immediately
+// Fetch active hotels
 $hotels = $conn->query("SELECT * FROM hotel_details WHERE Is_Active=1")->fetchAll(PDO::FETCH_ASSOC);
 
-// Selected hotel/type from POST
-$selectedHotel = $_POST['Hotel_ID'] ?? '';
-$selectedType = $_POST['Room_Type'] ?? '';
-$rooms = [];
+// store hotel id and room type
+$selectedHotel = $_SESSION['pending_booking']['hotel_id'] ?? '';
+$selectedType  = $_SESSION['pending_booking']['room_type'] ?? '';
 
-// Populate rooms if hotel & type selected
+// When user submits overwrite session values
+if (!empty($_POST['Hotel_ID'])) 
+{
+    $selectedHotel = $_POST['Hotel_ID'];
+}
+
+if (!empty($_POST['Room_Type'])) 
+{
+    $selectedType = $_POST['Room_Type'];
+}
+
+// room population
+$rooms = [];
 if ($selectedHotel && $selectedType) 
 {
     $stmt = $conn->prepare
@@ -40,7 +51,7 @@ if ($selectedHotel && $selectedType)
     $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Handle booking submission
+// booking submission
 $message = $error = '';
 if (isset($_POST['submitBookingRecord']) && !empty($_POST['Room_ID'])) 
 {
@@ -49,6 +60,7 @@ if (isset($_POST['submitBookingRecord']) && !empty($_POST['Room_ID']))
     $checkOut = $_POST['Check_out'];
     $credentialsId = $user['CredentialsID'];
 
+    // dates validation
     $today = date('Y-m-d');
     if ($checkIn < $today) 
     {
@@ -71,6 +83,7 @@ if (isset($_POST['submitBookingRecord']) && !empty($_POST['Room_ID']))
             ':Check_in' => $checkIn,
             ':Check_out' => $checkOut
         ]);
+
         if ($stmt->fetchColumn() > 0) 
         {
             $error = "Room is already booked for selected dates.";
@@ -94,17 +107,24 @@ if (isset($_POST['submitBookingRecord']) && !empty($_POST['Room_ID']))
                  ->execute([':room' => $roomId]);
 
             $message = "Booking successful!";
+
+            // Clear pending booking once used
+            if (isset($_SESSION['pending_booking'])) 
+            {
+                unset($_SESSION['pending_booking']);
+            }
         }
     }
 }
 
-// Fetch user bookings
+// get user bookings
 $stmt = $conn->prepare
 ("
     SELECT 
         b.Booking_Id, b.Check_in, b.Check_out, 
         hr.Room_Number, hr.Room_Type, 
-        hd.Hotel_Name, hd.Hotel_Image, hd.Hotel_Address
+        hd.Hotel_Name, hd.Hotel_Image,
+        CONCAT(hd.Hotel_Street_Name, ', ', hd.Hotel_City_Name, ', ', hd.Hotel_Country_Name) AS Hotel_Address
     FROM booking b
     JOIN hotels_rooms hr ON b.Room_Id = hr.Room_Id
     JOIN hotel_details hd ON hr.Hotel_Id = hd.Hotel_Id
@@ -121,7 +141,10 @@ foreach ($bookings as &$b)
 }
 unset($b);
 
-// Render to CustomerBooking template
+// close database connection
+$conn = null;
+
+// Render to CustomerBooking twig template
 echo $twig->render
 ('CustomerBooking.html.twig', 
 [

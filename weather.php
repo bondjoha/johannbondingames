@@ -1,5 +1,6 @@
 <?php
-function getWeather($address) {
+function getWeather($address) 
+{
     $apiKey = '2d98671851c8719dc908c170ba142d01';
 
     // Try to extract just the city name from the address
@@ -11,9 +12,11 @@ function getWeather($address) {
     $url = "https://api.openweathermap.org/data/2.5/weather?q={$city}&units=metric&appid={$apiKey}";
     $response = @file_get_contents($url);
 
-    if ($response === false) {
+    if ($response === false) 
+    {
         error_log("Weather API failed for city: $city ($address)");
-        return [
+        return 
+        [
             'temp' => 'N/A',
             'description' => 'No data',
             'icon' => '01d'
@@ -22,16 +25,19 @@ function getWeather($address) {
 
     $data = json_decode($response, true);
 
-    if (!$data || !isset($data['main']['temp'])) {
+    if (!$data || !isset($data['main']['temp'])) 
+    {
         error_log("Weather data missing for city: $city");
-        return [
+        return 
+        [
             'temp' => 'N/A',
             'description' => 'No data',
             'icon' => '01d'
         ];
     }
 
-    return [
+    return 
+    [
         'temp' => round($data['main']['temp']),
         'description' => $data['weather'][0]['description'],
         'icon' => $data['weather'][0]['icon']

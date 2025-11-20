@@ -1,11 +1,16 @@
 <?php
 
-session_start(); 
+session_start(); // getting data from previous pages 
 
-// Check login and that the role is admin
-if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true ||!isset($_SESSION['user_role']) || strtolower($_SESSION['user_role']) !== 'admin') 
+// check login
+if (!isset($_SESSION['user'])) 
 {
-    header('Location: LoginPage.php');
+    header('Location: Login.php');
+    exit;
+}
+
+if (!isset($_SESSION['user']['role']) || strtolower($_SESSION['user']['role']) !== 'admin') {
+    header('Location: Login.php');
     exit;
 }
 
@@ -15,10 +20,13 @@ $error   = null;
 // Load Twig and database connection
 require_once __DIR__ . '/vendor/autoload.php';
 require_once 'databaseconnect.php';
+
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
+
 $loader = new FilesystemLoader(__DIR__ . '/templates');
 $twig = new Environment($loader, []);
+
 
 // Hotels  names for dropdown
 $hotelStmt = $conn->prepare("SELECT Hotel_Id, Hotel_Name FROM hotel_details WHERE Is_Active=1 ORDER BY Hotel_Name ASC");
@@ -36,7 +44,7 @@ if (isset($_POST['submitRoomRecord']))
     $Room_Type = trim($_POST['Room_Type']);
     $Room_Price = floatval($_POST['Room_Price']);
     $Room_Status = trim($_POST['Room_Status']);
-    $Room_Square_Meter = floatval($_POST['Room_Square_Meter']); // NEW FIELD
+    $Room_Square_Meter = floatval($_POST['Room_Square_Meter']); 
 
     // Check that Room Type can be only standard, deluxe or suite
     if (!in_array($Room_Type, $validRoomTypes)) {
@@ -197,7 +205,8 @@ $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $conn = null; // Close DB connection
 
 // Render page to twig template
-echo $twig->render('RoomDetails.html.twig', [
+echo $twig->render('RoomDetails.html.twig', 
+[
     'hotels'=>$hotels,
     'rooms'=>$rooms,
     'selectedHotel'=>$selectedHotel,
