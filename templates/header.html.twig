@@ -1,0 +1,19 @@
+<!-- header.html.twig -->
+<header class="indexheader text-center">
+  <div class="container">
+    <h1 class="indexheader-title">Hotel Booking</h1>
+    <h2 class="indexheader-subtitle">Luxury hotels with unforgettable experiences</h2>
+  </div>
+</header>
+
+<!-- nav_links is an array that contins href, text, and other data that allows each page 
+to select the required links -->
+<nav class="navbar navbar-expand mb-4">
+  <div class="container">
+    {% for link in nav_links %}
+      <a href="{{ link.href }}" class="btn btn-outline-primary {% if link.active %}active{% endif %}">
+        {{ link.text }}
+      </a>
+    {% endfor %}
+  </div>
+</nav>

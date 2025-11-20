@@ -1,50 +1,48 @@
-// View Rooms Modal in index page html twig
 document.addEventListener("DOMContentLoaded", function() 
 {
+    // Modal elements
+    const modalEl = document.getElementById("roomsModal");
+    const roomsModal = new bootstrap.Modal(modalEl);
+    const modalTitle = modalEl.querySelector(".modal-title");
+    const modalBody = document.getElementById("roomsModalBody");
+
+    // Handle View Rooms click
     document.body.addEventListener("click", function(e) 
     {
-        // Check if the user clicks the View Rooms button 
         const btn = e.target.closest(".ViewDetailsButton");
-        if (!btn) return; // If the user does not click do not do nothing
+        if (!btn) return;
 
-        // Obtain the hotel ID and name from the button attributes
         const hotelId = btn.dataset.hotelId;
         const hotelName = btn.dataset.hotelName;
 
-        // Get modal elements
-        const modalEl = document.getElementById("roomsModal");
-        const modalTitle = modalEl.querySelector(".modal-title");
-        const modalBody = document.getElementById("roomsModalBody");
+        // Get selected dates from the search input
+        const checkIn = document.querySelector('input[name="check_in"]').value;
+        const checkOut = document.querySelector('input[name="check_out"]').value;
 
-        // Set modal title and loading message
         modalTitle.innerText = hotelName + " - Rooms";
         modalBody.innerHTML = "Loading...";
 
-        // Use POST to fetch the rooms
         fetch("load_rooms.php", 
         {
             method: "POST",
-            headers: 
-            {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: "hotel_id=" + encodeURIComponent(hotelId)
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "hotel_id=" + encodeURIComponent(hotelId) +
+                  "&check_in=" + encodeURIComponent(checkIn) +
+                  "&check_out=" + encodeURIComponent(checkOut)
         })
         .then(res => res.text())
         .then(html => 
         {
-            // Insert the room details 
             modalBody.innerHTML = html;
-            new bootstrap.Modal(modalEl).show();
+            roomsModal.show();
         })
         .catch(() => 
         {
-            // Show error message
             modalBody.innerHTML = "<p class='text-danger'>Unable to load rooms.</p>";
         });
     });
 
-    // City dropdown according to country
+    // Dynamic City dropdown based on selected country
     const countrySelect = document.getElementById("countrySelect");
     const citySelect = document.getElementById("citySelect");
 
@@ -53,30 +51,42 @@ document.addEventListener("DOMContentLoaded", function()
         const country = encodeURIComponent(this.value);
         citySelect.innerHTML = '<option value="">Loading...</option>';
 
-        // show all cities if user do not choose a country
         if (!country) 
         {
             citySelect.innerHTML = '<option value="">All Cities</option>';
             return;
         }
 
-        // obtain cities for the choosen country from database
         fetch("get_cities.php?country=" + country)
             .then(res => res.json())
             .then(data => 
             {
                 let options = '<option value="">All Cities</option>';
-                data.forEach(city => 
-                {
-                    options += `<option value="${city}">${city}</option>`;
-                });
+                data.forEach(city => options += `<option value="${city}">${city}</option>`);
                 citySelect.innerHTML = options;
             })
             .catch(() => 
             {
-                // Show error if fetch fails
                 citySelect.innerHTML = '<option value="">Unable to load cities</option>';
             });
     });
 
+    // AJAX search to not let page to reload and keep dates
+    const searchForm = document.getElementById("searchForm");
+    searchForm.addEventListener("submit", function(e) 
+    {
+        e.preventDefault(); // prevent full page reload
+        const formData = new FormData(this);
+
+        fetch("index.php", { method: "POST", body: formData })
+            .then(res => res.text())
+            .then(html => 
+            {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.querySelector(".main-content").innerHTML;
+                document.querySelector(".main-content").innerHTML = newContent;
+            })
+            .catch(err => console.error(err));
+    });
 });
