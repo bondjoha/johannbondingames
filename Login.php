@@ -1,77 +1,120 @@
 <?php
 session_start();
-include 'databaseconnect.php';
-require_once 'vendor/autoload.php';
 
-// Initialize Twig
-$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates'); 
-$twig = new \Twig\Environment($loader);
+// include twig and database connections
+require_once 'vendor/autoload.php';
+include 'databaseconnect.php';
+
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+
+// Twig setup
+$loader = new FilesystemLoader(__DIR__ . '/templates');
+$twig = new Environment($loader);
 
 $error = false;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_email'], $_POST['user_password'])) 
-{
+// Storing data from POST or GET methods
+$hotel_id    = $_POST['hotel_id']    ?? $_GET['hotel_id'] ?? null;
+$room_id     = $_POST['room_id']     ?? $_GET['room_id'] ?? null;
+$check_in    = $_POST['check_in']    ?? $_GET['check_in'] ?? '';
+$check_out   = $_POST['check_out']   ?? $_GET['check_out'] ?? '';
+$country     = $_POST['country']     ?? $_GET['country'] ?? '';
+$city        = $_POST['city']        ?? $_GET['city'] ?? '';
+$star_rating = $_POST['star_rating'] ?? $_GET['star_rating'] ?? '';
+
+// Process the login form
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['user_email']) && !empty($_POST['user_password'])) {
+
     $email = trim($_POST['user_email']);
     $password = $_POST['user_password'];
 
     try 
     {
-        $stmt = $conn->prepare("SELECT * FROM logincredentials WHERE user_email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $conn->prepare("SELECT * FROM logincredentials WHERE user_email = :email");
+        $stmt->execute(['email' => $email]);
+        $userDB = $stmt->fetch(PDO::FETCH_ASSOC);         
 
-        if ($user && password_verify($password, $user['user_password'])) {
-            // Save full user info in session
-            $_SESSION['user'] = [
-                'id' => $user['user_id'],
-                'first_name' => $user['first_name'],
-                'last_name' => $user['last_name'],
-                'email' => $user['user_email'],
-                'role' => strtolower(trim($user['user_role'])),
-                'phone' => $user['phone_number'],
-                'cardNumber' => $user['cardNumber'],
-                'expiry' => $user['expiry'],
-                'cvv' => $user['cvv']
+        if ($userDB && password_verify($password, $userDB['user_password'])) {
+
+            // Save data about the guest in the session
+            $_SESSION['user'] = 
+            [
+                'id'         => $userDB['user_id'],
+                'first_name' => $userDB['first_name'],
+                'last_name'  => $userDB['last_name'],
+                'email'      => $userDB['user_email'],
+                'role'       => strtolower(trim($userDB['user_role'])),
+                'phone'      => $userDB['phone_number'],
+                'cardNumber' => $userDB['cardNumber'],
+                'expiry'     => $userDB['expiry'],
+                'cvv'        => $userDB['cvv'],
+                'approved'   => $userDB['approved']
             ];
 
-            // If admin, redirect to Administrator.php and forget pending booking
-            if ($_SESSION['user']['role'] === 'admin') 
+            // if the super admin log in redirect to Administrator.php
+            if ($_SESSION['user']['role'] === 'admin' || $_SESSION['user']['role'] === 'staff')
             {
+                
                 unset($_SESSION['pending_booking']);
-                header('Location: Administrator.php');
+                header("Location: Administrator.php");
                 exit;
             }
 
-            // Regular user with pending booking
-            if (!empty($_POST['hotel_name']) && !empty($_POST['room_type'])) 
-            {
+            // pending booking session 
+            if ($hotel_id) {
                 $_SESSION['pending_booking'] = 
                 [
-                    'hotel_name' => $_POST['hotel_name'],
-                    'room_type' => $_POST['room_type'],
-                    'check_in' => $_POST['check_in'] ?? date('Y-m-d'),
-                    'check_out' => $_POST['check_out'] ?? date('Y-m-d', strtotime('+7 days'))
+                    'hotel_id'    => $hotel_id,
+                    'room_id'     => $room_id,
+                    'check_in'    => $check_in,
+                    'check_out'   => $check_out,
+                    'country'     => $country,
+                    'city'        => $city,
+                    'star_rating' => $star_rating
                 ];
-                header('Location: booking.php');
-                exit;
+
+                // Incase the room not selected by guest it will redirect to hotel page
+                if (empty($room_id)) 
+                {
+                    header("Location: ShowRoomTypes.php?hotel_id={$hotel_id}&check_in={$check_in}&check_out={$check_out}");
+                    exit;
+                }
+                else
+                {
+                    // But id the room has been selected it will redirect the user booking page
+                    header("Location: booking.php");
+                    exit;
+                }
             }
 
-            // Regular user with no pending booking
-            header('Location: index.php');
+            // Incase of no pending booking redirect to home page
+            header("Location: index.php");
             exit;
 
         } else 
         {
-            $error = true; // invalid credentials
+            $error = true;
         }
 
     } catch (PDOException $e) 
     {
-        $error = true; // database error
+        $error = true;
     }
 }
 
-// Render login page
-echo $twig->render('LoginPage.html.twig', ['error' => $error]);
+// Render to template login page
+echo $twig->render('LoginPage.html.twig',
+[
+    'error'      => $error,
+    'hotel_id'   => $hotel_id,
+    'room_id'    => $room_id,
+    'check_in'   => $check_in,
+    'check_out'  => $check_out,
+    'country'    => $country,
+    'city'       => $city,
+    'star_rating'=> $star_rating
+]);
+
 $conn = null;
 ?>

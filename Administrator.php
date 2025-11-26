@@ -28,7 +28,7 @@ if (!isset($_SESSION['user']))
 $user = $_SESSION['user'];
 
 //Check the role if it is admin otherwise redirect back to login
-if (!isset($user['role']) || strtolower($user['role']) !== 'admin') 
+if (!isset($user['role']) && (strtolower($user['role']) !== 'admin' || strtolower($user['role']) !== 'staff')) 
 {
     header("Location: Login.php");
     exit();
@@ -45,6 +45,8 @@ $twig = new Environment($loader);
 // Render to twig
 echo $twig->render('AdministratorPage.html.twig', 
 [
-    'adminName' => htmlspecialchars($adminName, ENT_QUOTES, 'UTF-8')
+    'adminName' => htmlspecialchars($adminName, ENT_QUOTES, 'UTF-8'),
+    'isApproved' => htmlspecialchars($user['approved'], ENT_QUOTES, 'UTF-8'), // to approve staff role 
+    'role' => htmlspecialchars($user['role'], ENT_QUOTES, 'UTF-8') 
 ]);
 ?>

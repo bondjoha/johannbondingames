@@ -205,7 +205,7 @@ $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $conn = null; // Close DB connection
 
 // Render page to twig template
-echo $twig->render('RoomDetails.html.twig', 
+echo $twig->render('TableRoomDetails.html.twig', 
 [
     'hotels'=>$hotels,
     'rooms'=>$rooms,

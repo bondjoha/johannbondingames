@@ -164,7 +164,7 @@ if (isset($_POST['deletebooking']))
 }
 
 // Render Twig Template
-echo $twig->render('BookingPage.html.twig', 
+echo $twig->render('TableBookingPage.html.twig', 
 [
     'hotels' => $hotels,
     'rooms' => $rooms,

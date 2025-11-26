@@ -4,13 +4,7 @@ session_start();
 $message = null;
 $error = null;
 
-if (!isset($_SESSION['user'])) 
-{
-    header('Location: Login.php');
-    exit;
-}
-
-if (!isset($_SESSION['user']['role']) || strtolower($_SESSION['user']['role']) !== 'admin') 
+if (!isset($_SESSION['user']) && strtolower($_SESSION['user']['role']) !== 'admin' && strtolower($_SESSION['user']['role']) !== 'staff')
 {
     header('Location: Login.php');
     exit;
@@ -39,6 +33,7 @@ if (isset($_POST['submitHotelRecord']))
     $Hotel_Image = trim($_POST['Hotel_Image']);
     $Hotel_Image2 = trim($_POST['Hotel_Image2'] ?? '');
     $Hotel_Image3 = trim($_POST['Hotel_Image3'] ?? '');
+    $staff_ids = $_POST['staff_ids'] ?? '';
 
     if ($Hotel_Name !== "" && $Hotel_Country_Name !== "") 
     {
@@ -52,15 +47,14 @@ if (isset($_POST['submitHotelRecord']))
         {
             try 
             {
-                $stmt = $conn->prepare
-                ("
+                // Insert hotel
+                $stmt = $conn->prepare("
                     INSERT INTO hotel_details 
                     (Hotel_Name, Hotel_Street_Name, Hotel_City_Name, Hotel_Country_Name, Phone_Number, Email, Star_Rating, Number_of_Rooms, Hotel_Image, Hotel_Image2, Hotel_Image3)
                     VALUES 
                     (:Hotel_Name, :Hotel_Street_Name, :Hotel_City_Name, :Hotel_Country_Name, :Phone_Number, :Email, :Star_Rating, :Number_of_Rooms, :Hotel_Image, :Hotel_Image2, :Hotel_Image3)
                 ");
-                $stmt->execute
-                ([
+                $stmt->execute([
                     ':Hotel_Name' => $Hotel_Name,
                     ':Hotel_Street_Name' => $Hotel_Street_Name,
                     ':Hotel_City_Name' => $Hotel_City_Name,
@@ -73,7 +67,26 @@ if (isset($_POST['submitHotelRecord']))
                     ':Hotel_Image2' => $Hotel_Image2,
                     ':Hotel_Image3' => $Hotel_Image3
                 ]);
-                $message = "New hotel record added successfully!";
+
+                // Get the ID of the newly inserted hotel
+                $hotelId = $conn->lastInsertId();
+
+                // Assign staff to this hotel
+                if (!empty($staff_ids)) 
+                {
+                    $assignStmt = $conn->prepare("
+                        INSERT INTO usershotels (user_id, hotel_id, role)
+                        VALUES (:user_id, :hotel_id, 'staff')
+                        ON DUPLICATE KEY UPDATE assigned_at = CURRENT_TIMESTAMP()
+                    ");
+
+                    $assignStmt->execute([
+                        ':user_id' => $staff_ids,
+                        ':hotel_id' => $hotelId
+                    ]);
+                }
+
+                $message = "New hotel record added successfully, and staff assigned!";
             } 
             catch (PDOException $e) 
             {
@@ -98,6 +111,7 @@ if (isset($_POST['updatehotel']))
     $Hotel_Image = trim($_POST['Hotel_Image']);
     $Hotel_Image2 = trim($_POST['Hotel_Image2'] ?? '');
     $Hotel_Image3 = trim($_POST['Hotel_Image3'] ?? '');
+    $staff_ids = $_POST['staff_ids'] ?? '';
 
     $check = $conn->prepare("SELECT COUNT(*) FROM hotel_details WHERE Hotel_Name = :Hotel_Name AND Hotel_Id != :Hotel_Id AND Is_Active = 1");
     $check->execute([':Hotel_Name' => $Hotel_Name, ':Hotel_Id' => $Hotel_Id]);
@@ -139,6 +153,29 @@ if (isset($_POST['updatehotel']))
                 ':Hotel_Image2' => $Hotel_Image2,
                 ':Hotel_Image3' => $Hotel_Image3
             ]);
+
+            // --- Update staff assignments ---
+            // Remove all previous staff assignments for this hotel
+            $conn->prepare("DELETE FROM usershotels WHERE hotel_id = :hotel_id AND role='staff'")->execute([
+                ':hotel_id' => $Hotel_Id
+            ]);
+
+            // Assign new staff
+            if (!empty($staff_ids)) 
+            {
+                $assignStmt = $conn->prepare("
+                    INSERT INTO usershotels (user_id, hotel_id, role)
+                    VALUES (:user_id, :hotel_id, 'staff')
+                    ON DUPLICATE KEY UPDATE assigned_at = CURRENT_TIMESTAMP()
+                ");
+               
+                    $assignStmt->execute
+                    ([
+                        ':user_id' => $staff_ids,
+                        ':hotel_id' => $Hotel_Id
+                    ]);
+            }
+
             $message = "Hotel record updated successfully!";
         } 
         catch (PDOException $e) 
@@ -199,11 +236,26 @@ else
     $hotels = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Fetch all staff users for dropdown
+try 
+{
+    $stmtUsers = $conn->query("SELECT user_id, first_name, last_name, user_email 
+                               FROM logincredentials 
+                               WHERE user_role = 'staff' AND approved = 1
+                               ORDER BY first_name, last_name");
+    $users = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
+} 
+catch (PDOException $e) 
+{
+    $users = [];
+    $error = "Error fetching staff users: " . htmlspecialchars($e->getMessage());
+}
+
+
 $conn = null;
 
 // Render Twig
-echo $twig->render
-('HotelDetails.html.twig',
+echo $twig->render('TableHotelDetails.html.twig', 
 [
     'hotels' => $hotels,
     'message' => $message,
@@ -211,5 +263,7 @@ echo $twig->render
     'countries' => $countries,
     'cities' => $cities,
     'selectedCountry' => $selectedCountry,
-    'selectedCity' => $selectedCity
+    'selectedCity' => $selectedCity,
+    'users' => $users,          // <-- add this
 ]);
+
