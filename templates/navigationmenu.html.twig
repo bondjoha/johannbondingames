@@ -1,0 +1,62 @@
+{# templates/navbar.html.twig #}
+
+<nav class="bg-white shadow">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+
+      <!-- Desktop Links -->
+      <div class="hidden md:flex space-x-6 items-center">
+        {% for link in nav_links %}
+          <a href="{{ link.href }}" 
+             class="text-gray-700 hover:text-yellow-500 px-3 py-2 rounded-md text-sm font-medium">
+            {{ link.text }}
+          </a>
+        {% endfor %}
+      </div>
+
+      
+
+      <!-- Mobile Hamburger Button -->
+      <div class="md:hidden flex items-center">
+        <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden px-2 pt-2 pb-4 space-y-1 bg-white shadow">
+    {% for link in nav_links %}
+      <a href="{{ link.href }}" 
+         class="block text-gray-700 hover:text-yellow-500 px-3 py-2 rounded-md text-base font-medium">
+        {{ link.text }}
+      </a>
+    {% endfor %}
+
+    {% if user %}
+      <span class="block text-gray-700 px-3 py-2">{{ user.first_name }}</span>
+      <form method="POST" action="logout.php" class="px-3 py-2">
+        <button type="submit" class="w-full px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-md text-sm font-medium">
+          Logout
+        </button>
+      </form>
+    {% else %}
+      <a href="Login.php" class="block px-3 py-2 bg-yellow-400 hover:bg-yellow-500 text-black rounded-md text-sm font-medium">Login</a>
+      <a href="Registration.php" class="block px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md text-sm font-medium">Register</a>
+    {% endif %}
+  </div>
+</nav>
+
+<script>
+  const btn = document.getElementById('mobile-menu-button');
+  const menu = document.getElementById('mobile-menu');
+
+  btn.addEventListener('click', () => {
+    menu.classList.toggle('hidden');
+  });
+</script>

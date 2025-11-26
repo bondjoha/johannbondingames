@@ -4,69 +4,89 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hotel Booking - Sign In</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
- <!-- CSS -->
-  <link rel="stylesheet" href="LoginStyle.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="javascripts/togglePassword.css">
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800">
+
+{% include 'headerwithoutsearch.html.twig' with { 'nav_links': nav_links } %}
 
 {% set nav_links = 
 [
-    { 'href': 'Index.php', 'text': 'Home Page' },
-    { 'href': 'Registration.php', 'text': 'Register' }
+    { 'href': 'Index.php', 'text': 'Home' }
 ] 
 %}
 
-{% include 'header.html.twig' with { 'nav_links': nav_links } %}
+{% include 'navigationmenu.html.twig' with { 'nav_links': nav_links, 'user': user } %}
 
 <!-- Login -->
-<main class="d-flex-center">
-  <div class="login-card">
-    <h2>Sign In</h2>
+<main class="flex items-center justify-center min-h-screen px-4">
+  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Sign In</h2>
 
+    <!-- in case the  credentials are incorrect display email or password are invalid-->
     {% if error %}
-      <div class="alert alert-danger text-center">
+      <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-center">
         Invalid email or password. Please try again.
       </div>
     {% endif %}
 
-    <form method="POST" action="">
-      <!-- Email textfield -->
-      <div class="mb-3">
-        <div class="input-group">
-          <span class="input-group-text bg-white border border-end-0">
-            <i class="bi bi-envelope-fill text-gold"></i>
-          </span>
-          <input type="email" name="user_email" class="form-control border-start-0" placeholder="Email address" required autocomplete="email">
-        </div>
+    <form method="POST" action="" class="space-y-4">
+      <!-- Email textfield box -->
+      <div>
+        <label class="block text-sm font-semibold mb-1">Email</label>
+        <input type="email" name="user_email" required
+               class="w-full px-3 py-2 border rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+               placeholder="Email address" autocomplete="email">
       </div>
 
-      <!-- Password input -->
-      <div class="mb-3 position-relative">
-        <div class="input-group">
-          <span class="input-group-text bg-white border border-end-0">
-            <i class="bi bi-lock-fill text-gold"></i>
-          </span>
-          <input type="password" id="password" name="user_password" class="form-control border-start-0" placeholder="Password" required autocomplete="current-password">
-          <span class="input-group-text bg-white border border-start-0" id="togglePassword" style="cursor:pointer;">
-            <i class="bi bi-eye-fill text-gold"></i>
-          </span>
-        </div>
+      <!-- Password textfield box -->
+      <div class="relative">
+        <label class="block text-sm font-semibold mb-1">Password</label>
+        <input type="password" id="password" name="user_password" required
+               class="w-full px-3 py-2 border rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+               placeholder="Password" autocomplete="current-password">
+        <span id="togglePassword" class="absolute right-3 top-9 cursor-pointer text-yellow-500">
+          👁
+        </span>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100 mb-2">Login</button>
+      <!-- search input entered bythe guest which will be hidden for post log in that will be used in the next page --> 
+      {% if hotel_id is defined %}
+        <input type="hidden" name="hotel_id" value="{{ hotel_id }}">
+      {% endif %}
+      {% if room_type is defined %}
+        <input type="hidden" name="room_type" value="{{ room_type }}">
+      {% endif %}
+      {% if check_in is defined %}
+        <input type="hidden" name="check_in" value="{{ check_in }}">
+      {% endif %}
+      {% if check_out is defined %}
+        <input type="hidden" name="check_out" value="{{ check_out }}">
+      {% endif %}
+      {% if country is defined %}
+        <input type="hidden" name="country" value="{{ country }}">
+      {% endif %}
+      {% if city is defined %}
+        <input type="hidden" name="city" value="{{ city }}">
+      {% endif %}
+      {% if star_rating is defined %}
+        <input type="hidden" name="star_rating" value="{{ star_rating }}">
+      {% endif %}
+
+      <button type="submit"
+              class="w-full py-2 px-4 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded shadow">
+        Login
+      </button>
     </form>
 
-    <div class="register-link">
-      <p class="mb-0">Don’t have an account? <a href="Registration.php">Register here</a></p>
-    </div>
+    <p class="text-center text-sm mt-4">
+      Don’t have an account? <a href="Registration.php" class="text-yellow-500 hover:underline">Register here</a>
+    </p>
   </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="javascripts/togglePassword.js"></script>
-
-
+{% include 'footer.html.twig'%}
 </body>
 </html>

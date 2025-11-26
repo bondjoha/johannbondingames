@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Available Hotels</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F5F5DC] text-slate-800">
+
+<!-- Header -->
+{% include 'header.html.twig' %}
+
+<div class="max-w-7xl mx-auto px-6 py-6">
+    <h2 class="text-3xl font-extrabold">Available Hotels</h2>
+    <p class="text-lg mt-1">Results for {{ city }}, {{ country }}</p>
+</div>
+
+<!-- Show the hotel that matches the search criterias -->
+<section class="max-w-7xl mx-auto px-6 py-10">
+    {% if hotels is empty %}
+        <p class="text-center text-xl font-semibold">No hotels found.</p>
+    {% else %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for hotel in hotels %}
+                {% set himgs = [hotel.Hotel_Image, hotel.Hotel_Image2, hotel.Hotel_Image3] | filter(v => v) %}
+                
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    
+                    <!-- Carousel -->
+                    {% if himgs %}
+                        <div class="relative w-full overflow-hidden">
+                            <div class="flex transition-transform duration-500" id="carousel-{{ hotel.Hotel_Id }}">
+                                {% for img in himgs %}
+                                    <img src="{{ img }}" class="w-full h-48 object-cover flex-shrink-0" alt="Hotel Image">
+                                {% endfor %}
+                            </div>
+
+                            {% if himgs|length > 1 %}
+                                <button data-carousel="{{ hotel.Hotel_Id }}" data-action="prev" class="absolute top-1/2 left-2 -translate-y-1/2 bg-white/70 px-2 py-1 rounded shadow">‹</button>
+                                <button data-carousel="{{ hotel.Hotel_Id }}" data-action="next" class="absolute top-1/2 right-2 -translate-y-1/2 bg-white/70 px-2 py-1 rounded shadow">›</button>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <img src="indeximages/default-hotel.jpg" class="w-full h-48 object-cover">
+                    {% endif %}
+
+                    <!-- Hotel Details -->
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold mb-2">{{ hotel.Hotel_Name }}</h3>
+                        <p class="text-gray-700"><strong>Street:</strong> {{ hotel.Hotel_Street_Name }}</p>
+                        <p class="text-gray-700"><strong>City:</strong> {{ hotel.Hotel_City_Name }}</p>
+                        <p class="text-gray-700"><strong>Country:</strong> {{ hotel.Hotel_Country_Name }}</p>
+                        <p class="text-gray-700"><strong>Phone:</strong> {{ hotel.Phone_Number }}</p>
+                        <p class="text-gray-700"><strong>Email:</strong> {{ hotel.Email }}</p>
+                        <p class="text-gray-700"><strong>Star Rating:</strong> {{ hotel.Star_Rating }}</p>
+
+                        <form action="ShowRoomTypes.php" method="POST" class="mt-4">
+                            <input type="hidden" name="hotel_id" value="{{ hotel.Hotel_Id }}">
+                            <input type="hidden" name="country" value="{{ country }}">
+                            <input type="hidden" name="city" value="{{ city }}">
+                            <input type="hidden" name="star_rating" value="{{ star_rating }}">
+                            <input type="hidden" name="check_in" value="{{ check_in }}">
+                            <input type="hidden" name="check_out" value="{{ check_out }}">
+                            <button type="submit"
+                                    class="inline-block bg-[#D4AF37] text-black font-semibold px-4 py-2 rounded hover:bg-[#B9972B]">
+                                View Rooms
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+
+<script src="javascripts/carouselplay.js"></script>
+{% include 'footer.html.twig' %}
+
+</body>
+</html>

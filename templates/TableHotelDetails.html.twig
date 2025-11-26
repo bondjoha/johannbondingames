@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+<div class="max-w-7xl mx-auto py-6 px-4">
+
+  <!-- Header -->
+  <header class="mb-6 text-center bg-gray-800 text-white py-4 rounded shadow">
+    <h1 class="text-3xl font-bold">Hotel List and Details</h1>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="flex justify-between mb-6">
+    <a href="Administrator.php" class="text-white bg-gray-700 px-4 py-2 rounded hover:bg-gray-600">Administrator Page</a>
+    <form action="logout.php" method="POST">
+      <button type="submit" class="text-white bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
+    </form>
+  </nav>
+
+  <!-- Messages -->
+  {% if message %}
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">{{ message }}</div>
+  {% endif %}
+  {% if error %}
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">{{ error }}</div>
+  {% endif %}
+
+  <!-- Add Hotel Form -->
+  <div class="bg-white p-6 rounded shadow mb-6">
+    <h2 class="text-xl font-semibold mb-4">Add New Hotel</h2>
+    <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <input type="text" name="Hotel_Name" placeholder="Hotel Name" class="border p-2 rounded" required>
+      <input type="text" name="Hotel_Street_Name" placeholder="Street Name" class="border p-2 rounded" required>
+      <input type="text" name="Hotel_City_Name" placeholder="City Name" class="border p-2 rounded" required>
+      <input type="text" name="Hotel_Country_Name" placeholder="Country Name" class="border p-2 rounded" required>
+      <input type="text" name="Phone_Number" placeholder="Phone Number" class="border p-2 rounded">
+      <input type="email" name="Email" placeholder="Hotel Email" class="border p-2 rounded">
+      <input type="number" name="Star_Rating" placeholder="Star Rating (1–5)" min="1" max="5" class="border p-2 rounded">
+      <input type="number" name="Number_of_Rooms" placeholder="Number of Rooms" min="1" class="border p-2 rounded">
+
+      <!-- Staff Multi-select -->
+      <select name="staff_ids" id="staff_ids" multiple
+              class="border p-2 rounded col-span-1 md:col-span-3 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              <option value="" disabled selected>Select staff member</option>
+        {% for user in users %}
+          <option value="{{ user.user_id }}">
+            {{ user.first_name }} {{ user.last_name }} ({{ user.user_email }})
+          </option>
+        {% endfor %}
+      </select>
+
+      <input type="text" name="Hotel_Image" placeholder="Hotel Image 1 URL" class="border p-2 rounded">
+      <input type="text" name="Hotel_Image2" placeholder="Hotel Image 2 URL" class="border p-2 rounded">
+      <input type="text" name="Hotel_Image3" placeholder="Hotel Image 3 URL" class="border p-2 rounded">
+
+      <button type="submit" name="submitHotelRecord" class="col-span-1 md:col-span-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        Add Hotel Record
+      </button>
+    </form>
+  </div>
+
+  <!-- Filter Form -->
+  <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div>
+      <label for="country" class="block font-semibold mb-1">Country</label>
+      <select name="country" id="country" class="border p-2 rounded w-full">
+        <option value="">All Countries</option>
+        {% for country in countries %}
+          <option value="{{ country }}" {% if country == selectedCountry %}selected{% endif %}>{{ country }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="city" class="block font-semibold mb-1">City</label>
+      <select name="city" id="city" class="border p-2 rounded w-full">
+        <option value="">All Cities</option>
+        {% for city in cities %}
+          <option value="{{ city }}" {% if city == selectedCity %}selected{% endif %}>{{ city }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="flex items-end">
+      <button type="submit" name="filterHotels" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">Filter</button>
+    </div>
+  </form>
+
+  <!-- Hotel List -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {% if hotels|length > 0 %}
+      {% for row in hotels %}
+        <div class="bg-white rounded shadow overflow-hidden">
+          {% set images = [row.Hotel_Image, row.Hotel_Image2, row.Hotel_Image3]|filter(v => v) %}
+          {% if images|length > 0 %}
+            <img src="{{ images[0]|e }}" class="w-full h-48 object-cover" alt="{{ row.Hotel_Name|e }}">
+          {% endif %}
+          <div class="p-4 space-y-2">
+            <form method="POST" class="space-y-2">
+              <input type="hidden" name="Hotel_Id" value="{{ row.Hotel_Id|e }}">
+              <input type="text" name="Hotel_Name" value="{{ row.Hotel_Name|e }}" placeholder="Hotel Name" class="border p-2 rounded w-full">
+              <input type="text" name="Hotel_Street_Name" value="{{ row.Hotel_Street_Name|e }}" placeholder="Street Name" class="border p-2 rounded w-full">
+              <input type="text" name="Hotel_City_Name" value="{{ row.Hotel_City_Name|e }}" placeholder="City" class="border p-2 rounded w-full">
+              <input type="text" name="Hotel_Country_Name" value="{{ row.Hotel_Country_Name|e }}" placeholder="Country" class="border p-2 rounded w-full">
+              <input type="text" name="Phone_Number" value="{{ row.Phone_Number|e }}" placeholder="Phone Number" class="border p-2 rounded w-full">
+              <input type="email" name="Email" value="{{ row.Email|e }}" placeholder="Email" class="border p-2 rounded w-full">
+              <input type="number" name="Star_Rating" value="{{ row.Star_Rating|e }}" min="1" max="5" placeholder="Star Rating" class="border p-2 rounded w-full">
+              <input type="number" name="Number_of_Rooms" value="{{ row.Number_of_Rooms|e }}" min="1" placeholder="Number of Rooms" class="border p-2 rounded w-full">
+              <select name="staff_ids" id="staff_ids" 
+              class="border p-2 rounded col-span-1 md:col-span-3 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                <option value="" disabled selected>Select staff member</option>
+              {% for user in users %}
+                <option value="{{ user.user_id }}">
+                  {{ user.first_name }} {{ user.last_name }} ({{ user.user_email }})
+                </option>
+              {% endfor %}
+            </select>
+              <input type="text" name="Hotel_Image" value="{{ row.Hotel_Image|e }}" placeholder="Hotel Image 1 URL" class="border p-2 rounded w-full">
+              <input type="text" name="Hotel_Image2" value="{{ row.Hotel_Image2|e }}" placeholder="Hotel Image 2 URL" class="border p-2 rounded w-full">
+              <input type="text" name="Hotel_Image3" value="{{ row.Hotel_Image3|e }}" placeholder="Hotel Image 3 URL" class="border p-2 rounded w-full">
+              <div class="flex justify-between">
+                <button type="submit" name="updatehotel" class="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700">Save Changes</button>
+                <button type="submit" name="delethotel" onclick="return confirm('Are you sure?');" class="bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700">Delete</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-center col-span-3 text-gray-500">No hotels found.</p>
+    {% endif %}
+  </div>
+
+</div>
+</body>
+</html>

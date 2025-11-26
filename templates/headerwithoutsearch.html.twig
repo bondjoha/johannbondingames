@@ -1,0 +1,45 @@
+<header class="bg-[#D4AF37] text-white">
+
+  <!-- Top Bar -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex items-center justify-between gap-6">
+
+      <!-- Logo -->
+      <a href="index.php" class="flex items-center gap-3 whitespace-nowrap">
+        <div class="w-35 h-10 flex items-center justify-center rounded bg-white/10 text-white font-bold text-lg">
+          Hotel Booking System
+        </div>
+      </a>
+
+      <!-- Hero Text -->
+      <div class="flex flex-col text-left leading-tight">
+        <h1 class="text-3xl sm:text-5xl font-extrabold">Find your next stay</h1>
+        <p class="text-lg sm:text-2xl opacity-90 mt-1">Luxury hotels with unforgettable experiences</p>
+      </div>
+
+      <!-- User/Admin -->
+      <div class="flex items-center gap-3 whitespace-nowrap">
+        {% if isAdmin %}
+          <a href="Administrator.php" class="text-yellow-300 font-semibold hover:text-yellow-400 hidden md:block">
+            Administration
+          </a>
+        {% endif %}
+
+        {% if user %}
+          <span class="hidden sm:inline-block text-sm font-medium">
+            Hello, {{ user.first_name }} {{ user.last_name }}
+          </span>
+          <form method="POST" action="logout.php" class="m-0">
+            <button type="submit" class="px-3 py-1.5 rounded bg-white text-[#D4AF37] font-semibold hover:opacity-95">Logout</button>
+          </form>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+</header>
+
+<!-- JS -->
+<script src="javascripts/citiesdropdown.js"></script>
+<script src="javascripts/checkinoutdatesvalidation.js"></script>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ hotel.Hotel_Name }} - Room Types</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+{% include 'header.html.twig' with {'user': user} %}
+
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-2">{{ hotel.Hotel_Name }}</h1>
+    <p class="text-gray-600 mb-6">{{ hotel.Hotel_City_Name }}, {{ hotel.Hotel_Country_Name }}</p>
+    {% include 'weatherforecast.html.twig' with { hotel: hotel } %}
+    <h2 class="text-2xl font-semibold mb-4">Available Room Types</h2>
+
+    {% set room_types = {'Standard': [], 'Deluxe': [], 'Suite': []} %}
+    {% for room in roomTypes %}
+        {% set images = [room.Image1, room.Image2, room.Image3]|filter(v => v) %}
+        {% if images %}
+            {% set room_types = room_types|merge({
+                (room.Room_Type): room_types[room.Room_Type]|merge([{
+                    'Room_Id': room.Room_Id,
+                    'Bed_Type': room.Bed_Type,
+                    'Size': room.Room_Square_Meter,
+                    'Price': room.Price,
+                    'Images': images
+                }])
+            }) %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for type, rooms in room_types %}
+            {% if rooms %}
+                {% set all_images = [] %}
+                {% for room in rooms %}
+                    {% set all_images = all_images|merge(room.Images) %}
+                {% endfor %}
+
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <h3 class="text-xl font-bold p-4">{{ type }} Room</h3>
+
+                    {% if all_images %}
+                        <div class="relative w-full overflow-hidden">
+                            <div id="carousel-{{ type }}" class="flex transition-transform duration-500">
+                                {% for img in all_images %}
+                                    <img src="{{ img }}" class="w-full h-48 object-cover flex-shrink-0" alt="{{ type }} Image">
+                                {% endfor %}
+                            </div>
+                            {% if all_images|length > 1 %}
+                                <button data-carousel="{{ type }}" data-action="prev" class="absolute top-1/2 left-2 -translate-y-1/2 bg-white/70 px-3 py-1 rounded shadow">‹</button>
+                                <button data-carousel="{{ type }}" data-action="next" class="absolute top-1/2 right-2 -translate-y-1/2 bg-white/70 px-3 py-1 rounded shadow">›</button>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="h-48 w-full flex items-center justify-center bg-gray-200 text-gray-500">
+                            No images available
+                        </div>
+                    {% endif %}
+
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-1"><strong>Bed Type:</strong> {{ rooms[0].Bed_Type }}</p>
+                        <p class="text-gray-700 mb-1"><strong>Size:</strong> {{ rooms[0].Size }} m²</p>
+                        <p class="text-gray-700 mb-1"><strong>Price per night:</strong> €{{ rooms[0].Price }}</p>
+
+                        {% set room_type_data = roomTypes|filter(r => r.Room_Type == type)|first %}
+                        {% set first_room = room_type_data.available_rooms[0] ?? null %}
+
+                        {% if first_room %}
+                            <p class="text-gray-700 mb-1"><strong>Room Number:</strong> {{ first_room.Room_Number }}</p>
+                        {% else %}
+                            <p class="text-red-600 font-semibold">{{ room_type_data.no_rooms_message }}</p>
+                        {% endif %}
+
+                        {% if user %}
+                            <form method="POST" action="booking.php">
+                                <input type="hidden" name="hotel_id" value="{{ hotel.Hotel_Id }}">
+                                <input type="hidden" name="room_id" value="{{ first_room.Room_Id }}">
+                                <input type="hidden" name="check_in" value="{{ check_in }}">
+                                <input type="hidden" name="check_out" value="{{ check_out }}">
+                                <input type="hidden" name="country" value="{{ country }}">
+                                <input type="hidden" name="city" value="{{ city }}">
+                                <input type="hidden" name="star_rating" value="{{ star_rating }}">
+
+                                <button type="submit" class="w-full md:w-auto px-4 py-2 rounded bg-[#D4AF37] text-black font-semibold hover:bg-[#B9972B] mt-2">
+                                    Book {{ type }} Room
+                                </button>
+                            </form>
+                        {% else %}
+                            {% if first_room %}
+                                <a href="login.php?hotel_id={{ hotel.Hotel_Id }}&room_id={{ first_room.Room_Id }}&check_in={{ check_in }}&check_out={{ check_out }}&country={{ country }}&city={{ city }}&star_rating={{ star_rating }}"
+                                   class="w-full md:w-auto inline-block text-center px-4 py-2 rounded bg-[#D4AF37] text-black font-semibold hover:bg-[#B9972B] mt-2">
+                                    Login to Book
+                                </a>
+                            {% else %}
+                                <span class="w-full md:w-auto inline-block text-center px-4 py-2 rounded bg-gray-400 text-white font-semibold mt-2">
+                                    No rooms available
+                                </span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<script src="javascripts/carouselplay.js"></script>
+{% include 'footer.html.twig' %}
+</body>
+</html>

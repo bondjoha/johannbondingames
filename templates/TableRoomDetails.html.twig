@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room Management</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container py-4">
+
+<header class="mb-3 text-center bg-secondary text-white py-3 shadow rounded">
+    <h1 class="display-4">Room List and Details</h1>
+</header>
+
+<!-- navigation menu -->
+<nav class="navbar navbar-expand bg-secondary mb-4">
+    <div class="container">
+        <a href="Administrator.php" class="btn btn-link text-white nav-link-hover me-3">Administrator Page</a>
+        <form action="logout.php" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-link text-white nav-link-hover">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<!-- Alerts messages -->
+{% if message %}
+    <div class="alert alert-success text-center">{{ message }}</div>
+{% endif %}
+{% if error %}
+    <div class="alert alert-danger text-center">{{ error }}</div>
+{% endif %}
+
+
+<!-- Add Room -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Add New Room</h5>
+
+        <form method="POST" class="row g-3">
+            <!-- dropdown list to select hotel name -->
+            <div class="col-md-3">
+                <label class="form-label">Select Hotel</label>
+                <select name="Hotel_Id" class="form-select" required>
+                    <option value="">-- Select Hotel --</option>
+                    {% for hotel in hotels %}
+                        <option value="{{ hotel.Hotel_Id }}">{{ hotel.Hotel_Name|e }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- room details -->
+            <div class="col-md-2"><label class="form-label">Room Number</label><input type="text" name="Room_Number" class="form-control" required></div>
+            <div class="form-group">
+                <label for="Room_Type">Room Type:</label>
+                <select name="Room_Type" id="Room_Type" class="form-control" required>
+                    <option value="Standard" {{ room.Room_Type is defined and room.Room_Type == 'Standard' ? 'selected' }}>Standard</option>
+                    <option value="Deluxe" {{ room.Room_Type is defined and room.Room_Type == 'Deluxe' ? 'selected' }}>Deluxe</option>
+                    <option value="Suite" {{ room.Room_Type is defined and room.Room_Type == 'Suite' ? 'selected' }}>Suite</option>
+                </select>
+            </div>
+            <div class="col-md-2"><label class="form-label">Price (€)</label><input type="number" name="Room_Price" class="form-control" step="0.01"></div>
+
+            <!-- room dimension -->     
+            <div class="col-md-2">
+                <label class="form-label">Room Square Meter</label>
+                <input type="number" name="Room_Square_Meter" class="form-control" step="0.1" required>
+            </div>
+
+            <!-- Bed type -->
+            <div class="col-md-3">
+                <label class="form-label">Bed Type</label>
+                <select name="Bed_Type" class="form-select" required>
+                    <option value="">-- Select Bed Type --</option>
+                    <option value="Two Single Beds">Two Single Beds</option>
+                    <option value="King Bed">King Bed</option>
+                    <option value="Queen Bed">Queen Bed</option>
+                </select>
+            </div>
+
+            <!-- set room status -->
+            <div class="col-md-2"><label class="form-label">Status</label>
+                <select name="Room_Status" class="form-select">
+                    <option value="Available">Available</option>
+                    <option value="Booked">Booked</option>
+                    <option value="Maintenance">Maintenance</option>
+                </select>
+            </div>
+
+            <!-- Add room button -->
+            <div class="col-12"><button type="submit" name="submitRoomRecord" class="btn btn-success">Add Room</button></div>
+        </form>
+    </div>
+</div>
+
+<!-- Hotel Filter Selection Drop Down -->
+<form method="POST" class="mb-4">
+    <div class="col-md-4">
+        <label class="form-label">Select Hotel To View Rooms</label>
+        <select name="hotel_filter" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Select Hotel --</option>
+            <!-- loop until you display all hotel names in the drop down list -->
+            {% for hotel in hotels %}
+                <option value="{{ hotel.Hotel_Id }}" {% if hotel.Hotel_Id == selectedHotel %}selected{% endif %}>
+                    {{ hotel.Hotel_Name|e }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+
+<!-- Room List -->
+{% if selectedHotel != "" %} <!-- display if hotel name is selected -->
+<div class="row g-3">
+    {% if rooms|length > 0 %} <!-- check if there are rooms -->
+        {% for room in rooms %} <!-- loop display all rooms one -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <form method="POST">
+                            <h5 class="card-title text-primary">{{ room.Hotel_Name|e }}</h5>
+                            <div class="mb-2">
+                                <label class="form-label">Room Number</label>
+                                <input type="text" name="Room_Number" class="form-control" value="{{ room.Room_Number|e }}">
+                            </div>
+
+                            <!-- drop down list to change hotel name if required -->
+                            <div class="mb-2">
+                                <label class="form-label">Hotel</label>
+                                <select name="Hotel_Id" class="form-select">
+                                    {% for hotel in hotels %}
+                                        <option value="{{ hotel.Hotel_Id }}" {% if hotel.Hotel_Id == room.Hotel_Id %}selected{% endif %}>
+                                            {{ hotel.Hotel_Name|e }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Room Type</label>
+                                <select name="Room_Type" class="form-select" required>
+                                    <option value="Standard" {% if room.Room_Type == 'Standard' %}selected{% endif %}>Standard</option>
+                                    <option value="Deluxe" {% if room.Room_Type == 'Deluxe' %}selected{% endif %}>Deluxe</option>
+                                    <option value="Suite" {% if room.Room_Type == 'Suite' %}selected{% endif %}>Suite</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Room Square Meter</label>
+                                <input type="number" name="Room_Square_Meter" class="form-control" value="{{ room.Room_Square_Meter|e }}" step="0.1" required>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Bed Type</label>
+                                <select name="Bed_Type" class="form-select" required>
+                                    <option value="Two Single Beds" {% if room.Bed_Type == 'Two Single Beds' %}selected{% endif %}>Two Single Beds</option>
+                                    <option value="King Bed" {% if room.Bed_Type == 'King Bed' %}selected{% endif %}>King Bed</option>
+                                    <option value="Queen Bed" {% if room.Bed_Type == 'Queen Bed' %}selected{% endif %}>Queen Bed</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Price (€)</label>
+                                <input type="number" name="Room_Price" class="form-control" value="{{ room.Price|e }}" step="0.01">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Status</label>
+                                <select name="Room_Status" class="form-select">
+                                    <option value="Available" {% if room.Status=='Available' %}selected{% endif %}>Available</option>
+                                    <option value="Booked" {% if room.Status=='Booked' %}selected{% endif %}>Booked</option>
+                                    <option value="Maintenance" {% if room.Status=='Maintenance' %}selected{% endif %}>Maintenance</option>
+                                </select>
+                            </div>
+
+                            <!-- buttond to update or delete/hide record -->
+                            <input type="hidden" name="Room_Id" value="{{ room.Room_Id|e }}">
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" name="updateroom" class="btn btn-primary btn-sm">Save</button>
+                                <button type="submit" name="deleteroom" class="btn btn-danger btn-sm" onclick="return confirm('Hide this room?');">Hide</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-center">No rooms found.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
