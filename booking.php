@@ -1,31 +1,33 @@
 <?php
-ini_set('display_errors', 1);
-session_start();
 
-include 'vendor/autoload.php';
-include 'databaseconnect.php'; // $conn as PDO
+require 'configure.php';
 
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 // Twig setup
 $loader = new FilesystemLoader(__DIR__ . '/templates');
-$twig   = new Environment($loader);
+$twig   = new Environment($loader, 
+[
+    'autoescape' => 'html' // Ensure all output is escaped by default
+]);
 
-// Logged-in user
-$user    = $_SESSION['user'] ?? null;
-$isAdmin = $user && isset($user['role']) && strtolower($user['role']) === 'admin';
+// Identify logged in user
+$user = $_SESSION['user'] ?? null;
 
-// Redirect to login if not logged in
-if (!$user) {
-    $_SESSION['pending_booking'] = $_POST + $_GET; // save all params
+// If no one is logged redirect to login and store booking data into the session
+if (!$user) 
+{
+    $_SESSION['pending_booking'] = $_POST + $_GET; 
+    $_SESSION['redirect_after_login'] = 'booking.php';
     header("Location: login.php");
     exit;
 }
 
-// --------------------------
-// Get booking info from POST or pending_booking session
-// --------------------------
+// checks if user is Administrator (isAdmin gives either true or false)
+$isAdmin = ($user && isset($user['role']) && strtolower($user['role']) === 'admin');
+
+// Storing the booking information first through POST, then via pending_booking session
 $hotel_id  = $_POST['hotel_id']  ?? $_SESSION['pending_booking']['hotel_id'] ?? null;
 $room_id   = $_POST['room_id']   ?? $_SESSION['pending_booking']['room_id'] ?? null;
 $check_in  = $_POST['check_in']  ?? $_SESSION['pending_booking']['check_in'] ?? date('Y-m-d');
@@ -34,40 +36,61 @@ $country   = $_POST['country']   ?? $_SESSION['pending_booking']['country'] ?? '
 $city      = $_POST['city']      ?? $_SESSION['pending_booking']['city'] ?? '';
 $star_rating = $_POST['star_rating'] ?? $_SESSION['pending_booking']['star_rating'] ?? '';
 
-// Validate
-if (!$hotel_id || !$room_id) {
-    die("Incomplete booking information.");
+// Validate hotel_id and room_id as integers
+$hotel_id = filter_var($hotel_id, FILTER_VALIDATE_INT);
+$room_id  = filter_var($room_id, FILTER_VALIDATE_INT);
+
+// Incase there is no hotel or room ID exit the program and show an error.
+if (!$hotel_id || !$room_id) 
+{
+    exit("Incomplete booking information.");
 }
 
-// --------------------------
-// Fetch hotel info
-// --------------------------
+// Validate star rating if provided
+if ($star_rating !== '') 
+{
+    $star_rating = filter_var($star_rating, FILTER_VALIDATE_INT, 
+    [
+        'options' => ['min_range' => 1, 'max_range' => 5]
+    ]);
+    if ($star_rating === false) 
+    {
+        $star_rating = '';
+    }
+}
+
+// retrieve selected hotel information
 $stmt = $conn->prepare("SELECT * FROM hotel_details WHERE Hotel_Id = ?");
 $stmt->execute([$hotel_id]);
 $hotel = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$hotel) die("Hotel not found.");
 
-// --------------------------
-// Fetch selected room
-// --------------------------
+// If no hotel is found stop execution and display error message
+if (!$hotel) 
+{
+    exit("Hotel not found.");
+}
+
+// retrieving selected room 
 $stmt = $conn->prepare("SELECT * FROM hotels_rooms WHERE Room_Id = ? AND Is_Active = 1");
 $stmt->execute([$room_id]);
 $room = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$room) die("Room not found.");
 
-// --------------------------
-// Calculate total nights and price
-// --------------------------
+// If no room is found stop execution and display error message
+if (!$room) 
+{
+    exit("Room not found.");
+}
+
+// Calculate number of nights and the total price
 $checkInDate  = new DateTime($check_in);
 $checkOutDate = new DateTime($check_out);
 $interval     = $checkInDate->diff($checkOutDate);
 $nights       = $interval->days;
 $totalPrice   = $room['Price'] * $nights;
 
-// --------------------------
-// Render Twig
-// --------------------------
-echo $twig->render('BookingPage.html.twig', [
+// Rendering to Twig BookingPage.html.twig
+echo $twig->render('BookingPage.html.twig', 
+[
     'hotel'       => $hotel,
     'room'        => $room,
     'user'        => $user,

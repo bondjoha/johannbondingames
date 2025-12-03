@@ -12,6 +12,14 @@
 <!-- Header -->
 {% include 'header.html.twig' %}
 
+ {% set nav_links = 
+  [
+    { 'href': 'index.php', 'text': 'Home' }
+  ] %}
+
+{% include 'navigationmenu.html.twig' with {'nav_links': nav_links, 'user': user} %}
+
+
 <div class="max-w-7xl mx-auto px-6 py-6">
     <h2 class="text-3xl font-extrabold">Available Hotels</h2>
     <p class="text-lg mt-1">Results for {{ city }}, {{ country }}</p>

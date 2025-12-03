@@ -4,16 +4,43 @@
     <meta charset="UTF-8">
     <title>{{ hotel.Hotel_Name }} - Room Types</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 
 <body class="bg-gray-100 text-gray-800">
 
 {% include 'header.html.twig' with {'user': user} %}
+{% set nav_links = [
+    { 'href': 'index.php', 'text': 'Home' }
+] %}
+{% include 'navigationmenu.html.twig' with {'nav_links': nav_links, 'user': user} %}
 
 <div class="container mx-auto p-6">
     <h1 class="text-3xl font-bold mb-2">{{ hotel.Hotel_Name }}</h1>
     <p class="text-gray-600 mb-6">{{ hotel.Hotel_City_Name }}, {{ hotel.Hotel_Country_Name }}</p>
+
+    <h2 class="text-2xl font-semibold mb-3">Today Weather </h2>
     {% include 'weatherforecast.html.twig' with { hotel: hotel } %}
+
+    <!-- Map Section -->
+    {% if hotel.Latitude and hotel.Longitude %}
+         <h2 class="text-2xl font-semibold mb-3">Hotel Location</h2>
+        <div id="hotel-map" class="w-full h-64 rounded-lg shadow-lg mb-6"></div>
+        
+        <script>
+            window.HOTEL_DATA = {
+                lat: {{ hotel.Latitude }},
+                lon: {{ hotel.Longitude }},
+                name: "{{ hotel.Hotel_Name|e('js') }}"
+            };
+        </script>
+
+        <script src="javascripts/mapApi.js"></script>
+    {% endif %}
+
     <h2 class="text-2xl font-semibold mb-4">Available Room Types</h2>
 
     {% set room_types = {'Standard': [], 'Deluxe': [], 'Suite': []} %}
@@ -110,5 +137,6 @@
 
 <script src="javascripts/carouselplay.js"></script>
 {% include 'footer.html.twig' %}
+
 </body>
 </html>

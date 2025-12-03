@@ -13,30 +13,41 @@ if (!empty($hotel['Latitude']) && !empty($hotel['Longitude'])) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
 
-    if ($response === false) {
+    if ($response === false) 
+    {
         // cURL error
         error_log("Weather API cURL error: " . curl_error($ch));
-    } else {
+    } 
+    else 
+    {
         $data = json_decode($response, true);
 
-        if (!empty($data['list'])) {
+        if (!empty($data['list'])) 
+        {
             $dailyWeather = [];
-            foreach ($data['list'] as $entry) {
+            foreach ($data['list'] as $entry) 
+            {
                 $date = gmdate('Y-m-d', $entry['dt']);
-                if (!isset($dailyWeather[$date])) {
-                    $dailyWeather[$date] = [
+                if (!isset($dailyWeather[$date])) 
+                {
+                    $dailyWeather[$date] = 
+                    [
                         'temp_min' => $entry['main']['temp_min'],
                         'temp_max' => $entry['main']['temp_max'],
                         'weather'  => $entry['weather'][0],
                     ];
-                } else {
+                } 
+                else 
+                {
                     $dailyWeather[$date]['temp_min'] = min($dailyWeather[$date]['temp_min'], $entry['main']['temp_min']);
                     $dailyWeather[$date]['temp_max'] = max($dailyWeather[$date]['temp_max'], $entry['main']['temp_max']);
                 }
             }
             // Keep only next 5 days
             $hotel['weather'] = array_slice($dailyWeather, 0, 5, true);
-        } else {
+        } 
+        else 
+        {
             error_log("Weather API returned empty list for hotel ID: {$hotel['Hotel_Id']}");
         }
     }

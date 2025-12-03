@@ -10,7 +10,8 @@
 
 {% include 'headerwithoutsearch.html.twig' with { 'nav_links': nav_links } %}
 
-{% set nav_links = [
+{% set nav_links = 
+[
     { 'href': 'Index.php', 'text': 'Home' },
     { 'href': 'Login.php', 'text': 'Log In' }
 ] %}
@@ -33,6 +34,7 @@
         <div>
           <label for="first_name" class="block text-sm font-semibold mb-1">First Name</label>
           <input id="first_name" type="text" name="first_name" placeholder="First Name" required
+                 value="{{ first_name|default('') }}"
                  class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
 
@@ -40,6 +42,7 @@
         <div>
           <label for="last_name" class="block text-sm font-semibold mb-1">Last Name</label>
           <input id="last_name" type="text" name="last_name" placeholder="Last Name" required
+                 value="{{ last_name|default('') }}"
                  class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
 
@@ -47,6 +50,7 @@
         <div>
           <label for="user_email" class="block text-sm font-semibold mb-1">Email</label>
           <input id="user_email" type="email" name="user_email" placeholder="Enter your email" required
+                 value="{{ user_email|default('') }}"
                  class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
 
@@ -54,22 +58,38 @@
         <div>
           <label for="phone_number" class="block text-sm font-semibold mb-1">Phone Number</label>
           <input id="phone_number" type="tel" name="phone_number" placeholder="Optional"
+                 value="{{ phone_number|default('') }}"
                  class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
 
-        <!-- Password -->
+       <!-- Password -->
         <div class="relative">
           <label for="user_password" class="block text-sm font-semibold mb-1">Password</label>
-          <input id="user_password" type="password" name="user_password" placeholder="Enter password" required
-                 class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          <input id="password" type="password" name="user_password" required
+                placeholder="Enter password"
+                class="w-full px-3 py-2 border rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          
+          <!-- Toggle password visibility -->
+          <span id="togglePassword" class="absolute right-3 top-9 cursor-pointer text-yellow-500">👁</span>
+
+          <!-- Password requirement warning -->
+          <p id="password-warning" class="text-red-600 text-sm mt-1 hidden">
+            Password must be at least 8 characters, include uppercase, lowercase, number, and special character.
+          </p>
         </div>
 
         <!-- Confirm Password -->
         <div class="relative">
           <label for="confirm_password" class="block text-sm font-semibold mb-1">Confirm Password</label>
-          <input id="confirm_password" type="password" name="confirm_password" placeholder="Confirm password" required
-                 class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
+          <input id="confirm_password" type="password" name="confirm_password" required
+                placeholder="Confirm password"
+                class="w-full px-3 py-2 border rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+
+          <p id="password-match-warning" class="text-red-600 text-sm mt-1 hidden">
+            Passwords do not match.
+          </p>
         </div>
+
 
         <!-- User Role -->
         <div class="relative">
@@ -77,11 +97,10 @@
           <select id="user_role" name="user_role" required
                   class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
             <option value="">Select role</option>
-            <option value="customer">Customer</option>
-            <option value="staff">Staff</option>
+            <option value="customer" {% if user_role is defined and user_role == 'customer' %}selected{% endif %}>Customer</option>
+            <option value="staff" {% if user_role is defined and user_role == 'staff' %}selected{% endif %}>Staff</option>
           </select>
         </div>
-
 
         <!-- Submit Button -->
         <button type="submit" name="submit"
@@ -91,6 +110,8 @@
       </form>
     </div>
   </main>
+
+<script src="javascripts/togglePassword.js"></script>
 {% include 'footer.html.twig' %}
 </body>
 </html>

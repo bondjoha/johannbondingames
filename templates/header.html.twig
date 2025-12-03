@@ -41,7 +41,7 @@
 
                   <!-- Dropdown menu -->
                   <div id="user-profile-menu" class="hidden absolute right-0 mt-2 w-36 bg-white text-slate-800 rounded-lg shadow-lg flex-col z-50 py-1">
-                      <a href="profile.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Edit Profile</a>
+                      <a href="EditUserProfile.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Edit Profile</a>
                       <a href="bookingHistory.php" class="block px-4 py-2 text-sm hover:bg-gray-100">My Bookings</a>
                       <form method="POST" action="logout.php">
                           <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Logout</button>
@@ -93,13 +93,24 @@
       <!-- Star Rating -->
       <div class="w-full md:w-32 bg-white rounded px-3 py-2 text-slate-800">
           <label class="block text-xs font-semibold mb-1">Star Rating</label>
-          <select name="star_rating" class="w-full bg-transparent outline-none text-sm text-slate-800">
+          <select id="star-select" name="star_rating" class="w-full bg-transparent outline-none text-sm text-slate-800">
               <option value="">Any</option>
-              {% for i in 1..5 %}
-                  <option value="{{ i }}" {% if i == star_rating|default('') %}selected{% endif %}>
-                      {{ i }} Star{% if i > 1 %}s{% endif %}
-                  </option>
-              {% endfor %}
+             {% if available_ratings|length > 0 %}
+                  {% for r in available_ratings %}
+                      <option value="{{ r.Star_Rating }}"
+                          {% if r.Star_Rating == star_rating %}selected{% endif %}>
+                          {{ r.Star_Rating }} Star{% if r.Star_Rating > 1 %}s{% endif %}
+                      </option>
+                  {% endfor %}
+              {% else %}
+                  {# fallback: show all #}
+                  {% for i in 1..5 %}
+                      <option value="{{ i }}" {% if i == star_rating %}selected{% endif %}>
+                          {{ i }} Star{% if i > 1 %}s{% endif %}
+                      </option>
+                  {% endfor %}
+              {% endif %}
+
           </select>
       </div>
 
@@ -146,4 +157,6 @@
 <script src="javascripts/citiesdropdown.js"></script>
 <script src="javascripts/checkinoutdatesvalidation.js"></script>
 <script src="javascripts/profileMenu.js"></script>
+<script src="javascripts/starRatingsSearch.js"></script>
+
 
