@@ -1,33 +1,50 @@
 <?php
-ini_set('display_errors', 1);
-session_start();
 
-// including twig and pdo connection
-include 'vendor/autoload.php'; 
-include 'databaseconnect.php';
-
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
+require 'configure.php';
 
 // Twig setup
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 $loader = new FilesystemLoader(__DIR__ . '/templates');
-$twig   = new Environment($loader);
+$twig   = new Environment($loader, 
+[
+    'autoescape' => 'html' // Ensure all output is escaped by default
+]);
 
-// Login user session
-$user    = $_SESSION['user'] ?? null;
-$isAdmin = $user && isset($user['role']) && strtolower($user['role']) === 'admin';
+// Identify logged in user
+if (isset($_SESSION['user'])) 
+{
+    $user = $_SESSION['user'];
+} 
+else 
+{
+    $user = null;
+}
 
-//storing the header search filters and the hotel id
-$hotel_id   = $_POST['hotel_id'] ?? $_GET['hotel_id'] ?? null;
+
+// checks if user is Administrator (isAdmin gives either true or false)
+$isAdmin = ($user && isset($user['role']) && strtolower($user['role']) === 'admin');
+
+// storing the header search filters and the hotel id
+$hotel_id   = filter_input(INPUT_POST, 'hotel_id', FILTER_VALIDATE_INT) 
+           ?? filter_input(INPUT_GET, 'hotel_id', FILTER_VALIDATE_INT);
+
 $check_in   = $_POST['check_in'] ?? $_GET['check_in'] ?? date('Y-m-d');
 $check_out  = $_POST['check_out'] ?? $_GET['check_out'] ?? date('Y-m-d', strtotime('+1 day'));
 $country    = $_POST['country'] ?? $_GET['country'] ?? '';
 $city       = $_POST['city'] ?? $_GET['city'] ?? '';
 $star_rating= $_POST['star_rating'] ?? $_GET['star_rating'] ?? '';
 
-if (!$hotel_id) 
+// if there is no valid hotel id exit the code to prevent invalid SQL queries or any other misusage
+if (empty($hotel_id)) 
 {
-    die("Hotel not specified.");
+    exit("Invalid or missing hotel ID.");
+}
+
+// Validate that check-in is before check-out
+if (strtotime($check_in) >= strtotime($check_out)) 
+{
+    exit("Check-out date must be after check-in date.");
 }
 
 // Saving the search filters in the header in session
@@ -37,14 +54,18 @@ $_SESSION['selected_star']    = $star_rating;
 $_SESSION['check_in']         = $check_in;
 $_SESSION['check_out']        = $check_out;
 
-// Fetching all information from database table hotel details
+// Finding and storing in $hotel the hotel record which matches the searched hotel ID 
 $stmt = $conn->prepare("SELECT * FROM hotel_details WHERE Hotel_Id = ?");
 $stmt->execute([$hotel_id]);
 $hotel = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$hotel) die("Hotel not found.");
+// check that hotel exists if not exit the program
+if (!$hotel) 
+{
+    exit("Hotel not found.");
+}
 
-// Fetching all information from database table hotel rooms
+// Retrieve all active room types associated with the selected hotel
 $stmt = $conn->prepare("SELECT * FROM hotels_rooms WHERE Hotel_Id = ? AND Is_Active = 1");
 $stmt->execute([$hotel_id]);
 $roomTypes = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -59,7 +80,6 @@ $countries = $conn->query
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // getting the cities to populate the header city dropdown according to the country
-// in case country is not selected the dropdown will not be populated
 $cities = [];
 if (!empty($hotel['Hotel_Country_Name'])) 
 {
@@ -73,34 +93,28 @@ if (!empty($hotel['Hotel_Country_Name']))
     $cities = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// selecting first avaliable room number for each room type
+// For each room type, get all available rooms during the selected dates
 foreach ($roomTypes as &$room) 
 {
-    $stmt = $conn->prepare
-    ("
+    $stmt = $conn->prepare("
         SELECT hr.Room_Number, hr.Room_Id
         FROM hotels_rooms hr
+        LEFT JOIN booking b
+            ON hr.Room_Id = b.Room_Id
+            AND NOT (b.Check_Out <= ? OR b.Check_In >= ?)
         WHERE hr.Hotel_Id = ? 
           AND hr.Room_Type = ?
           AND hr.Is_Active = 1
-          AND hr.Room_Id NOT IN 
-          (
-              SELECT b.Room_Id
-              FROM booking b
-              WHERE NOT 
-              (
-                  b.Check_Out <= ? OR b.Check_In >= ?
-              )
-          )
-        LIMIT 1
+          AND b.Room_Id IS NULL
+        ORDER BY hr.Room_Number
     ");
-    $stmt->execute([$hotel_id, $room['Room_Type'], $check_in, $check_out]);
-    $FreeRoom = $stmt->fetch(PDO::FETCH_ASSOC); // fetch single room
 
-    if ($FreeRoom) 
+    $stmt->execute([$check_in, $check_out, $hotel_id, $room['Room_Type']]);
+    $availableRooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if ($availableRooms) 
     {
-        // assign only the first available room in an array for consistency
-        $room['available_rooms'] = [$FreeRoom];
+        $room['available_rooms'] = $availableRooms;
     } 
     else 
     {
@@ -110,7 +124,27 @@ foreach ($roomTypes as &$room)
 }
 unset($room);
 
-$hotels = include 'weatherApiOneHotel.php';
+// save pending bookings if not logged in
+if (!$user && !empty($roomTypes)) 
+{
+    $firstRoomType = $roomTypes[0]['Room_Type'] ?? null;
+    $firstRoom     = $roomTypes[0]['available_rooms'][0]['Room_Id'] ?? null;
+
+    $_SESSION['pending_booking'] = [
+        'hotel_id'    => $hotel_id,
+        'room_id'     => $firstRoom,
+        'room_type'   => $firstRoomType,
+        'check_in'    => $check_in,
+        'check_out'   => $check_out,
+        'country'     => $country,
+        'city'        => $city,
+        'star_rating' => $star_rating,
+        
+    ];
+}
+
+// Include weather API data
+include 'weatherApiOneHotel.php';
 
 // Render to Twig
 echo $twig->render('ShowRoomTypes.html.twig', 
@@ -129,3 +163,4 @@ echo $twig->render('ShowRoomTypes.html.twig',
 ]);
 
 $conn = null;
+?>
