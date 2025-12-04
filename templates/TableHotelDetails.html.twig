@@ -1,76 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hotel Management</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8"> <!-- character encoding for proper displaying -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Makes page responsive for mobile displays-->
+  <title>Hotel Management</title> <!-- browser tab tite -->
+  <script src="https://cdn.tailwindcss.com"></script> <!-- tailwind CSS to be used for the styling -->
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 text-gray-800">
 
-<div class="max-w-7xl mx-auto py-6 px-4">
+<div class="max-w-9xl mx-auto py-6 px-4">
 
   <!-- Header -->
-  <header class="mb-6 text-center bg-gray-800 text-white py-4 rounded shadow">
+  <header class="mb-6 text-center bg-gray-700 text-white py-4 rounded shadow">
     <h1 class="text-3xl font-bold">Hotel List and Details</h1>
   </header>
 
-  <!-- Navigation -->
-  <nav class="flex justify-between mb-6">
-    <a href="Administrator.php" class="text-white bg-gray-700 px-4 py-2 rounded hover:bg-gray-600">Administrator Page</a>
-    <form action="logout.php" method="POST">
-      <button type="submit" class="text-white bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
-    </form>
-  </nav>
+<!-- Navigation -->
+<nav class="mb-6 bg-gray-600 rounded shadow">
+    <div class="flex items-center space-x-4 py-2 px-4">
+        <a href="Administrator.php" class="text-white hover:text-gray-200 font-medium">Administrator Page</a>
+        <form action="logout.php" method="POST" class="inline">
+            <button type="submit" class="text-white hover:text-gray-200 font-medium">Logout</button>
+        </form>
+    </div>
+</nav>
 
   <!-- Messages -->
   {% if message %}
-    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">{{ message }}</div>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{{ message }}</div>
   {% endif %}
   {% if error %}
-    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">{{ error }}</div>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{{ error }}</div>
   {% endif %}
 
-  <!-- Add Hotel Form -->
-  <div class="bg-white p-6 rounded shadow mb-6">
-    <h2 class="text-xl font-semibold mb-4">Add New Hotel</h2>
-    <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <input type="text" name="Hotel_Name" placeholder="Hotel Name" class="border p-2 rounded" required>
-      <input type="text" name="Hotel_Street_Name" placeholder="Street Name" class="border p-2 rounded" required>
-      <input type="text" name="Hotel_City_Name" placeholder="City Name" class="border p-2 rounded" required>
-      <input type="text" name="Hotel_Country_Name" placeholder="Country Name" class="border p-2 rounded" required>
-      <input type="text" name="Phone_Number" placeholder="Phone Number" class="border p-2 rounded">
-      <input type="email" name="Email" placeholder="Hotel Email" class="border p-2 rounded">
-      <input type="number" name="Star_Rating" placeholder="Star Rating (1–5)" min="1" max="5" class="border p-2 rounded">
-      <input type="number" name="Number_of_Rooms" placeholder="Number of Rooms" min="1" class="border p-2 rounded">
+<!-- Add Hotel Form -->
+<div class="bg-white p-6 rounded shadow mb-6">
+  <h2 class="text-2xl font-semibold mb-4">Add New Hotel</h2>
+  <form method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-      <!-- Staff Multi-select -->
-      <select name="staff_ids" id="staff_ids" multiple
-              class="border p-2 rounded col-span-1 md:col-span-3 focus:outline-none focus:ring-2 focus:ring-yellow-400">
-              <option value="" disabled selected>Select staff member</option>
-        {% for user in users %}
-          <option value="{{ user.user_id }}">
-            {{ user.first_name }} {{ user.last_name }} ({{ user.user_email }})
-          </option>
-        {% endfor %}
+    <!-- Hotel input textfields to add new record -->
+    <div>
+      <label class="block font-medium mb-1">Hotel Name</label>
+      <input type="text" name="Hotel_Name" placeholder="Hotel Name" class="border rounded px-3 py-2 w-full" required>
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">Street Name</label>
+      <input type="text" name="Hotel_Street_Name" placeholder="Street Name" class="border rounded px-3 py-2 w-full" required>
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">City Name</label>
+      <input type="text" name="Hotel_City_Name" placeholder="City Name" class="border rounded px-3 py-2 w-full" required>
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">Country Name</label>
+      <input type="text" name="Hotel_Country_Name" placeholder="Country Name" class="border rounded px-3 py-2 w-full" required>
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">Phone Number</label>
+      <input type="text" name="Phone_Number" placeholder="Phone Number" class="border rounded px-3 py-2 w-full">
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">Hotel Email</label>
+      <input type="email" name="Email" placeholder="Hotel Email" class="border rounded px-3 py-2 w-full">
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">Star Rating (1–5)</label>
+      <input type="number" name="Star_Rating" placeholder="Star Rating" min="1" max="5" class="border rounded px-3 py-2 w-full">
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">Number of Rooms</label>
+      <input type="number" name="Number_of_Rooms" placeholder="Number of Rooms" min="1" class="border rounded px-3 py-2 w-full">
+    </div>
+
+    <!-- Assign staff -->
+    <div>
+      <label class="block font-medium mb-1">Assign Staff Member</label>
+      <select name="staff_ids" id="staff_ids" class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+          <option value="" disabled selected>Select staff member</option>
+          {% for user in users %}
+              <option value="{{ user.user_id }}" {% if user.user_id == row.assigned_staff_id|default('') %}selected{% endif %}>
+                  {{ user.first_name }} {{ user.last_name }} ({{ user.user_email }})
+              </option>
+          {% endfor %}
       </select>
+    </div>
 
-      <input type="text" name="Hotel_Image" placeholder="Hotel Image 1 URL" class="border p-2 rounded">
-      <input type="text" name="Hotel_Image2" placeholder="Hotel Image 2 URL" class="border p-2 rounded">
-      <input type="text" name="Hotel_Image3" placeholder="Hotel Image 3 URL" class="border p-2 rounded">
+    <!-- Add images -->
+    <div>
+      <label class="block font-medium mb-1">Hotel Image 1</label>
+      <input type="file" name="Hotel_Image" accept="image/*" class="border rounded px-3 py-2 w-full">
+    </div>
 
-      <button type="submit" name="submitHotelRecord" class="col-span-1 md:col-span-3 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-        Add Hotel Record
-      </button>
-    </form>
-  </div>
+    <div>
+      <label class="block font-medium mb-1">Hotel Image 2</label>
+      <input type="file" name="Hotel_Image2" accept="image/*" class="border rounded px-3 py-2 w-full">
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">Hotel Image 3</label>
+      <input type="file" name="Hotel_Image3" accept="image/*" class="border rounded px-3 py-2 w-full">
+    </div>
+
+    <!-- Coordinates -->
+    <div>
+      <label class="block font-medium mb-1">Latitude</label>
+      <input type="number" name="Latitude" placeholder="35.843346" step="0.000001" class="border rounded px-3 py-2 w-full">
+    </div>
+
+    <div>
+      <label class="block font-medium mb-1">Longitude</label>
+      <input type="number" name="Longitude" placeholder="14.468560" step="0.000001" class="border rounded px-3 py-2 w-full">
+    </div>
+
+    <button type="submit" name="submitHotelRecord" class="col-span-1 md:col-span-3 bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800">
+      Add Hotel Record
+    </button>
+
+  </form>
+</div>
 
   <!-- Filter Form -->
-  <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div>
+      <label for="hotel_name" class="block font-semibold mb-1">Hotel Name</label>
+      <input type="text" name="hotel_name" id="hotel_name" value="{{ selectedName|default('') }}" placeholder="Hotel Name" class="border rounded px-3 py-2 w-full">
+    </div>
     <div>
       <label for="country" class="block font-semibold mb-1">Country</label>
-      <select name="country" id="country" class="border p-2 rounded w-full">
+      <select name="country" id="country" class="border rounded px-3 py-2 w-full">
         <option value="">All Countries</option>
         {% for country in countries %}
           <option value="{{ country }}" {% if country == selectedCountry %}selected{% endif %}>{{ country }}</option>
@@ -79,7 +144,7 @@
     </div>
     <div>
       <label for="city" class="block font-semibold mb-1">City</label>
-      <select name="city" id="city" class="border p-2 rounded w-full">
+      <select name="city" id="city" class="border rounded px-3 py-2 w-full">
         <option value="">All Cities</option>
         {% for city in cities %}
           <option value="{{ city }}" {% if city == selectedCity %}selected{% endif %}>{{ city }}</option>
@@ -91,42 +156,101 @@
     </div>
   </form>
 
-  <!-- Hotel List -->
+  <!-- Hotel Card List Grid display -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {% if hotels|length > 0 %}
-      {% for row in hotels %}
+    <!-- check that hotels list is not empty -->
+    {% if hotels|length > 0 %} 
+      <!-- loop to display all hotel cards -->
+      {% for row in hotels %} 
         <div class="bg-white rounded shadow overflow-hidden">
+          <!-- array of available images -->
           {% set images = [row.Hotel_Image, row.Hotel_Image2, row.Hotel_Image3]|filter(v => v) %}
+          <!-- display hotel first images -->
           {% if images|length > 0 %}
             <img src="{{ images[0]|e }}" class="w-full h-48 object-cover" alt="{{ row.Hotel_Name|e }}">
           {% endif %}
           <div class="p-4 space-y-2">
-            <form method="POST" class="space-y-2">
+            <form method="POST" enctype="multipart/form-data" class="space-y-2">
+
+              <!-- Hotel ID hidden input -->
               <input type="hidden" name="Hotel_Id" value="{{ row.Hotel_Id|e }}">
-              <input type="text" name="Hotel_Name" value="{{ row.Hotel_Name|e }}" placeholder="Hotel Name" class="border p-2 rounded w-full">
-              <input type="text" name="Hotel_Street_Name" value="{{ row.Hotel_Street_Name|e }}" placeholder="Street Name" class="border p-2 rounded w-full">
-              <input type="text" name="Hotel_City_Name" value="{{ row.Hotel_City_Name|e }}" placeholder="City" class="border p-2 rounded w-full">
-              <input type="text" name="Hotel_Country_Name" value="{{ row.Hotel_Country_Name|e }}" placeholder="Country" class="border p-2 rounded w-full">
-              <input type="text" name="Phone_Number" value="{{ row.Phone_Number|e }}" placeholder="Phone Number" class="border p-2 rounded w-full">
-              <input type="email" name="Email" value="{{ row.Email|e }}" placeholder="Email" class="border p-2 rounded w-full">
-              <input type="number" name="Star_Rating" value="{{ row.Star_Rating|e }}" min="1" max="5" placeholder="Star Rating" class="border p-2 rounded w-full">
-              <input type="number" name="Number_of_Rooms" value="{{ row.Number_of_Rooms|e }}" min="1" placeholder="Number of Rooms" class="border p-2 rounded w-full">
-              <select name="staff_ids" id="staff_ids" 
-              class="border p-2 rounded col-span-1 md:col-span-3 focus:outline-none focus:ring-2 focus:ring-yellow-400">
-                <option value="" disabled selected>Select staff member</option>
-              {% for user in users %}
-                <option value="{{ user.user_id }}">
-                  {{ user.first_name }} {{ user.last_name }} ({{ user.user_email }})
-                </option>
-              {% endfor %}
-            </select>
-              <input type="text" name="Hotel_Image" value="{{ row.Hotel_Image|e }}" placeholder="Hotel Image 1 URL" class="border p-2 rounded w-full">
-              <input type="text" name="Hotel_Image2" value="{{ row.Hotel_Image2|e }}" placeholder="Hotel Image 2 URL" class="border p-2 rounded w-full">
-              <input type="text" name="Hotel_Image3" value="{{ row.Hotel_Image3|e }}" placeholder="Hotel Image 3 URL" class="border p-2 rounded w-full">
-              <div class="flex justify-between">
-                <button type="submit" name="updatehotel" class="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700">Save Changes</button>
-                <button type="submit" name="delethotel" onclick="return confirm('Are you sure?');" class="bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700">Delete</button>
+
+              <!-- Existing images hidden inputs-->
+              <input type="hidden" name="Hotel_Image_existing" value="{{ row.Hotel_Image|default('') }}">
+              <input type="hidden" name="Hotel_Image2_existing" value="{{ row.Hotel_Image2|default('') }}">
+              <input type="hidden" name="Hotel_Image3_existing" value="{{ row.Hotel_Image3|default('') }}">
+
+              <!-- Hotel record textfields -->
+              <label for="Hotel_Name" class="block mb-1 font-medium">Hotel Name</label>
+              <input type="text" id="Hotel_Name" name="Hotel_Name" value="{{ row.Hotel_Name|e }}" class="border rounded px-3 py-2 w-full">
+
+              <label for="Hotel_Street_Name" class="block mb-1 font-medium">Street Name</label>
+              <input type="text" id="Hotel_Street_Name" name="Hotel_Street_Name" value="{{ row.Hotel_Street_Name|e }}" class="border rounded px-3 py-2 w-full">
+
+              <label for="Hotel_City_Name" class="block mb-1 font-medium">City</label>
+              <input type="text" id="Hotel_City_Name" name="Hotel_City_Name" value="{{ row.Hotel_City_Name|e }}" class="border rounded px-3 py-2 w-full">
+
+              <label for="Hotel_Country_Name" class="block mb-1 font-medium">Country</label>
+              <input type="text" id="Hotel_Country_Name" name="Hotel_Country_Name" value="{{ row.Hotel_Country_Name|e }}" class="border rounded px-3 py-2 w-full">
+
+              <label for="Phone_Number" class="block mb-1 font-medium">Phone Number</label>
+              <input type="text" id="Phone_Number" name="Phone_Number" value="{{ row.Phone_Number|e }}" class="border rounded px-3 py-2 w-full">
+
+              <label for="Email" class="block mb-1 font-medium">Email</label>
+              <input type="email" id="Email" name="Email" value="{{ row.Email|e }}" class="border rounded px-3 py-2 w-full">
+
+              <label for="Star_Rating" class="block mb-1 font-medium">Star Rating</label>
+              <input type="number" id="Star_Rating" name="Star_Rating" value="{{ row.Star_Rating|e }}" min="1" max="5" class="border rounded px-3 py-2 w-full">
+
+              <label for="Number_of_Rooms" class="block mb-1 font-medium">Number of Rooms</label>
+              <input type="number" id="Number_of_Rooms" name="Number_of_Rooms" value="{{ row.Number_of_Rooms|e }}" min="1" class="border rounded px-3 py-2 w-full">
+
+              <!-- Staff assignment -->
+              <label for="assigned_staff" class="block mb-1 font-medium">Current Assigned Staff</label>
+              <input type="text" name="assigned_staff" id="assigned_staff" value="{{ row.assigned_staff_name }}" class="border rounded px-3 py-2 w-full" readonly>
+
+              <label for="staff_ids" class="block mt-2 mb-1 font-medium">Change Assigned Staff</label>
+              <select name="staff_ids" id="staff_ids" class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                  <option value="" disabled>Select staff member</option>
+                  {% for user in users %}
+                      <option value="{{ user.user_id }}" {% if user.user_id == row.assigned_staff_id %}selected{% endif %}>
+                          {{ user.first_name }} {{ user.last_name }} ({{ user.user_email }})
+                      </option>
+                  {% endfor %}
+              </select>
+
+              <!-- Update images -->
+              <label for="Hotel_Image" class="block mt-2 mb-1 font-medium">Hotel Image 1</label>
+              <input type="file" id="Hotel_Image" name="Hotel_Image" accept="image/*" class="border rounded px-3 py-2 w-full">
+              {% if row.Hotel_Image %}
+                <img src="{{ row.Hotel_Image|e }}" class="w-full h-32 object-cover mt-2 rounded" alt="{{ row.Hotel_Name|e }}">
+              {% endif %}
+
+              <label for="Hotel_Image2" class="block mt-2 mb-1 font-medium">Hotel Image 2</label>
+              <input type="file" id="Hotel_Image2" name="Hotel_Image2" accept="image/*" class="border rounded px-3 py-2 w-full">
+              {% if row.Hotel_Image2 %}
+                <img src="{{ row.Hotel_Image2|e }}" class="w-full h-32 object-cover mt-2 rounded" alt="{{ row.Hotel_Name|e }}">
+              {% endif %}
+
+              <label for="Hotel_Image3" class="block mt-2 mb-1 font-medium">Hotel Image 3</label>
+              <input type="file" id="Hotel_Image3" name="Hotel_Image3" accept="image/*" class="border rounded px-3 py-2 w-full">
+              {% if row.Hotel_Image3 %}
+                <img src="{{ row.Hotel_Image3|e }}" class="w-full h-32 object-cover mt-2 rounded" alt="{{ row.Hotel_Name|e }}">
+              {% endif %}
+
+              <!-- Coordinates -->
+              <label for="Latitude" class="block mt-2 mb-1 font-medium">Latitude</label>
+              <input type="number" id="Latitude" name="Latitude" value="{{ row.Latitude|e }}" step="0.000001" class="border rounded px-3 py-2 w-full">
+
+              <label for="Longitude" class="block mt-2 mb-1 font-medium">Longitude</label>
+              <input type="number" id="Longitude" name="Longitude" value="{{ row.Longitude|e }}" step="0.000001" class="border rounded px-3 py-2 w-full">
+
+              <!-- Buttons -->
+              <div class="flex justify-between mt-4">
+                  <button type="submit" name="updatehotel" class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800">Save Changes</button>
+                  <button type="submit" name="delethotel" onclick="return confirm('Are you sure?');" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Delete</button>
               </div>
+
             </form>
           </div>
         </div>

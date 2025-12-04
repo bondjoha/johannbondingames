@@ -1,9 +1,30 @@
-<!-- ================= FOOTER ================= -->
-<footer class="bg-[#D4AF37] text-white py-6 mt-12 text-center">
-  <p class="text-sm">
-    &copy; {{ "now"|date("Y") }} Hotel Booking System. All rights reserved.
-  </p>
-  <p class="text-sm mt-1">
-    <a href="#" class="underline hover:text-black">Terms and Conditions</a>
-  </p>
+<footer class="bg-[#D4AF37] text-white mt-12">
+  <div class="max-w-9xl mx-auto px-6 py-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+
+    <!-- Title-->
+    <div>
+      <h2 class="text-2xl font-bold mb-1">Hotel Booking System</h2>
+    </div>
+
+    <!-- Legal text  -->
+    <div class="mx-auto text-sm">
+      <h3 class="font-semibold mb-1">Legal</h3>
+      <p class="mb-1">© {{ "now"|date("Y") }} All rights reserved.</p>
+      <p class="mb-1">Terms and Conditions</p>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="ml-auto text-sm">
+      <h3 class="font-semibold mb-1">Contact</h3>
+      <p class="mb-1"><span class="font-semibold">Email:</span> johann.bondin@stc.com</p>
+      <p class="mb-1"><span class="font-semibold">Phone:</span> +356 79 299 323</p>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bg-[#B9972B] text-center py-2 text-sm opacity-90">
+    Designed and maintained by Hotel Booking System
+  </div>
 </footer>
+

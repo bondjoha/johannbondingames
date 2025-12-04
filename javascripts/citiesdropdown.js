@@ -3,9 +3,6 @@ document.addEventListener('DOMContentLoaded', function ()
     const countrySelect = document.querySelector('select[name="country"]');
     const citySelect = document.getElementById('city-select');
 
-    // ⛔ Remove this — it clears Twig cities on page load!
-    // citySelect.innerHTML = '<option value="">Select City</option>';
-
     // Only update when USER changes country
     countrySelect.addEventListener('change', function () 
     {

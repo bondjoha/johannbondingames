@@ -1,105 +1,155 @@
 <?php
+require 'configure.php';
 
-ini_set('display_errors', 1);
-session_start();
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) 
+{
+    session_start();
+}
 
-// include twig and database connection
-include 'vendor/autoload.php'; // Twig
-include 'databaseconnect.php'; // $conn as PDO
-
-// Twig Setup
+// Twig setup
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
-$twig   = new \Twig\Environment($loader);
+$twig   = new \Twig\Environment($loader, ['autoescape' => 'html']);
 
-// Logged in guest credentials
-$user    = $_SESSION['user'] ?? null;
-$isAdmin = $user && isset($user['role']) && strtolower($user['role']) === 'admin';
+// Identify logged-in user
+$user = $_SESSION['user'] ?? null;
+$isAdmin = ($user && isset($user['role']) && strtolower($user['role']) === 'admin');
 
-// search data from POST when search button is clicked
-$country     = $_POST['country']     ?? '';
-$city        = $_POST['city']        ?? '';
-$star_rating = $_POST['star_rating'] ?? '';
-$check_in    = $_POST['check_in']    ?? '';
-$check_out   = $_POST['check_out']   ?? '';
+// Retrieve search parameters: POST -> GET -> SESSION -> default
+$country     = trim($_POST['country'] ?? $_GET['country'] ?? $_SESSION['selected_country'] ?? '');
+$city        = trim($_POST['city'] ?? $_GET['city'] ?? $_SESSION['selected_city'] ?? '');
+$star_rating = trim($_POST['star_rating'] ?? $_GET['star_rating'] ?? $_SESSION['selected_star'] ?? '');
+$check_in    = trim($_POST['check_in'] ?? $_GET['check_in'] ?? $_SESSION['check_in'] ?? date('Y-m-d'));
+$check_out   = trim($_POST['check_out'] ?? $_GET['check_out'] ?? $_SESSION['check_out'] ?? date('Y-m-d', strtotime('+1 day')));
 
-// Save the data of the search in the session
+// Prevent form resubmission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') 
+{
+    $query = http_build_query
+    ([
+        'country'     => $country,
+        'city'        => $city,
+        'star_rating' => $star_rating,
+        'check_in'    => $check_in,
+        'check_out'   => $check_out
+    ]);
+    header("Location: " . $_SERVER['PHP_SELF'] . "?$query");
+    exit;
+}
+
+// Store search parameters in session
 $_SESSION['selected_country'] = $country;
 $_SESSION['selected_city']    = $city;
 $_SESSION['selected_star']    = $star_rating;
 $_SESSION['check_in']         = $check_in;
 $_SESSION['check_out']        = $check_out;
 
-// get the country list from the database table hotel details
-$countries = $conn->query
-("
-    SELECT DISTINCT Hotel_Country_Name
-    FROM hotel_details
-    WHERE Is_Active = 1
-    ORDER BY Hotel_Country_Name
-")
-->fetchAll(PDO::FETCH_ASSOC);
+// Validate dates
+$checkInDate  = DateTime::createFromFormat('Y-m-d', $check_in);
+$checkOutDate = DateTime::createFromFormat('Y-m-d', $check_out);
 
-// get the city list from the database table hotel details
-if (!empty($country))
+if (!$checkInDate || !$checkOutDate || $checkInDate > $checkOutDate) 
 {
-    $stmt = $conn->prepare
-    (
-     "SELECT DISTINCT Hotel_City_Name
-      FROM hotel_details
-      WHERE Is_Active = 1 AND Hotel_Country_Name = ?
-      ORDER BY Hotel_City_Name"
-    );
-
-    $stmt->execute([$country]);
-    $cities = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-else
-{
-    $cities = [];
+    $checkInDate  = new DateTime();
+    $checkOutDate = (new DateTime())->modify('+1 day');
+    $check_in  = $checkInDate->format('Y-m-d');
+    $check_out = $checkOutDate->format('Y-m-d');
 }
 
-// find the hotel that matches the search inputs 
+// Validate star rating (only integers 1-5)
+if ($star_rating !== '') 
+{
+    $star_rating = filter_var($star_rating, FILTER_VALIDATE_INT, 
+    [
+        'options' => ['min_range' => 1, 'max_range' => 5]
+    ]) ?: '';
+}
 
-$sql    = "SELECT * FROM hotel_details WHERE Is_Active = 1";
-$searchResult = [];
+// Fetch countries for dropdown
+try 
+{
+    $countries = $conn->query
+    ("
+        SELECT DISTINCT Hotel_Country_Name 
+        FROM hotel_details 
+        WHERE Is_Active = 1 
+        ORDER BY Hotel_Country_Name
+    ")->fetchAll(PDO::FETCH_ASSOC);
 
+    // Validate selected country exists
+    $countryNames = array_column($countries, 'Hotel_Country_Name');
+    if ($country !== '' && !in_array($country, $countryNames, true)) 
+    {
+        $country = '';
+    }
+
+} 
+catch (Exception $e) 
+{
+    $countries = [];
+    $country = '';
+}
+
+// Fetch cities based on selected country
+$cities = [];
 if ($country !== '')
 {
-    $sql .= " AND Hotel_Country_Name = ?";
-    $searchResult[] = $country;
-}
+    $stmt = $conn->prepare
+    ("
+        SELECT DISTINCT Hotel_City_Name 
+        FROM hotel_details 
+        WHERE Is_Active = 1 AND Hotel_Country_Name = :country
+        ORDER BY Hotel_City_Name
+    ");
+    $stmt->execute(['country' => $country]);
+    $cities = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if ($city !== '')
+    // Validate selected city exists
+    $cityNames = array_column($cities, 'Hotel_City_Name');
+    if ($city !== '' && !in_array($city, $cityNames, true))
+    {
+        $city = '';
+    }
+}
+// Fetch hotels matching criteria
+$whereHotels = ["Is_Active = 1"];
+$paramsHotels = [];
+if ($country !== '') 
 {
-    $sql .= " AND Hotel_City_Name = ?";
-    $searchResult[] = $city;
+    $whereHotels[] = "Hotel_Country_Name = :country";
+    $paramsHotels['country'] = $country;
 }
-
-if ($star_rating !== '')
+if ($city !== '') 
 {
-    $sql .= " AND Star_Rating = ?";
-    $searchResult[] = $star_rating;
+    $whereHotels[] = "Hotel_City_Name = :city";
+    $paramsHotels['city'] = $city;
+}
+if ($star_rating !== '') 
+{
+    $whereHotels[] = "Star_Rating = :rating";
+    $paramsHotels['rating'] = $star_rating;
 }
 
-$sql .= " ORDER BY Hotel_Name ASC";
-
-$stmt = $conn->prepare($sql);
-$stmt->execute($searchResult);
+$sqlHotels = "SELECT * FROM hotel_details WHERE " . implode(" AND ", $whereHotels) . " ORDER BY Hotel_Name ASC";
+$stmt = $conn->prepare($sqlHotels);
+$stmt->execute($paramsHotels);
 $hotels = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Close database connection
 $conn = null;
 
-// Render Template
-echo $twig->render('IndexSearchResultsPage.html.twig',
-[
-    'hotels'      => $hotels,
-    'country'     => $country,
-    'city'        => $city,
-    'star_rating' => $star_rating,
-    'check_in'    => $check_in,
-    'check_out'   => $check_out,
-    'countries'   => $countries,
-    'cities'      => $cities,
-    'user'        => $user,
-    'isAdmin'     => $isAdmin
+// Render Twig template
+echo $twig->render('IndexSearchResultsPage.html.twig', [
+    'hotels'           => $hotels,
+    'country'          => $country,
+    'city'             => $city,
+    'star_rating'      => $star_rating,
+    'check_in'         => $check_in,
+    'check_out'        => $check_out,
+    'countries'        => $countries,
+    'cities'           => $cities,
+    'user'             => $user,
+    'isAdmin'          => $isAdmin,
+    'available_ratings'=> $available_ratings
 ]);
+?>

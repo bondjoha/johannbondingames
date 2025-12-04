@@ -1,45 +1,59 @@
 <?php
-session_start();
-ini_set('display_errors', 1);
-
-include 'vendor/autoload.php';
-include 'databaseconnect.php';
-
+require 'configure.php';
+// Twig setup
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
-
-// Twig setup
 $loader = new FilesystemLoader(__DIR__ . '/templates');
-$twig   = new Environment($loader);
+$twig   = new Environment($loader, 
+[
+    'autoescape' => 'html' // Ensure all output is escaped by default
+]);
 
-// User must be logged in
-if (!isset($_SESSION['user'])) {
+// resuming pending booking to get the guest booking data
+if (empty($_POST) && empty($_GET) && isset($_SESSION['pending_booking'])) 
+{
+    $_POST = $_SESSION['pending_booking'];
+    unset($_SESSION['pending_booking']);
+}
+
+// checking that user is logged in and if not redirect him back to login
+if (!isset($_SESSION['user'])) 
+{
+    $_SESSION['pending_booking'] = $_POST + $_GET; // store booking details to not lose them
     header("Location: login.php");
     exit;
 }
 
 $user = $_SESSION['user'];
-$user_id = $user['id']; // consistent key
-
-// Get POST data
-$hotel_id    = $_POST['hotel_id'] ?? null;
-$room_id     = $_POST['room_id'] ?? null;
-$check_in    = $_POST['check_in'] ?? null;
-$check_out   = $_POST['check_out'] ?? null;
-$total_price = $_POST['total_price'] ?? null;
-$room_type   = $_POST['room_type'] ?? null;
-
-// Validate input
-if (!$hotel_id || !$room_id || !$check_in || !$check_out || !$room_type) {
-    die("Missing booking information.");
+$user_id = filter_var($user['id'], FILTER_VALIDATE_INT);
+if (!$user_id) 
+{
+    die("Invalid user ID.");
 }
 
-try {
-    // Start transaction
-    $conn->beginTransaction();
+// retrieving booking details with validation
+$hotel_id    = filter_var($_POST['hotel_id'] ?? null, FILTER_VALIDATE_INT);
+$room_id     = filter_var($_POST['room_id'] ?? null, FILTER_VALIDATE_INT);
+$total_price = filter_var($_POST['total_price'] ?? null, FILTER_VALIDATE_FLOAT);
+$check_in    = DateTime::createFromFormat('Y-m-d', $_POST['check_in'] ?? '');
+$check_out   = DateTime::createFromFormat('Y-m-d', $_POST['check_out'] ?? '');
+$room_type   = htmlspecialchars($_POST['room_type'] ?? '');
 
-    // Insert new booking
-    $stmt = $conn->prepare("
+if (!$hotel_id || !$room_id || !$total_price || !$check_in || !$check_out || !$room_type) 
+{
+    die("Missing or invalid booking information.");
+}
+
+// Convert Date to string because database
+$check_in_str  = $check_in->format('Y-m-d');
+$check_out_str = $check_out->format('Y-m-d');
+
+try
+{
+    $conn->beginTransaction();
+    // Insert user booking in database
+    $stmt = $conn->prepare
+    ("
         INSERT INTO booking 
         (User_Id, Hotel_Id, Room_Id, Room_Type, Check_In, Check_Out, Total_Price, Booking_Date)
         VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
@@ -49,22 +63,21 @@ try {
         $hotel_id,
         $room_id,
         $room_type,
-        $check_in,
-        $check_out,
+        $check_in_str,
+        $check_out_str,
         $total_price
     ]);
-
     $conn->commit();
-
-} catch (Exception $e) {
-    $conn->rollBack();
-    die("Booking failed: " . $e->getMessage());
+} 
+catch (Exception $e) 
+{
+    $conn->rollBack(); // prevent inconsistent database state
+    die("Booking failed."); // do not expose DB errors in production
 }
 
-// ---------------------------------------------------------
-// FETCH CUSTOMER BOOKING HISTORY
-// ---------------------------------------------------------
-$stmt = $conn->prepare("
+// retrieving booking records from table booking
+$stmt = $conn->prepare
+("
     SELECT b.*, h.Hotel_Name, h.Hotel_City_Name, h.Hotel_Country_Name, r.Room_Number
     FROM booking b
     INNER JOIN hotel_details h ON h.Hotel_Id = b.Hotel_Id
@@ -75,30 +88,34 @@ $stmt = $conn->prepare("
 $stmt->execute([$user_id]);
 $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Bookings number of nights 
-$checkInDate  = new DateTime($check_in);
-$checkOutDate = new DateTime($check_out);
-$number_of_nights = $checkInDate->diff($checkOutDate)->days;
+// Calculate number of nights safely
+$checkInDate  = $check_in;
+$checkOutDate = $check_out;
+try 
+{
+    $number_of_nights = $checkInDate->diff($checkOutDate)->days;
+} 
+catch (Exception $e) 
+{
+    $number_of_nights = 0;
+}
 
-// ---------------------------------------------------------
-// FETCH HOTEL INFO FOR THE CURRENT BOOKING CONFIRMATION
-// ---------------------------------------------------------
+// retrieving current booking record to display it
 $stmt = $conn->prepare("SELECT * FROM hotel_details WHERE Hotel_Id = ?");
 $stmt->execute([$hotel_id]);
 $hotel = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// ---------------------------------------------------------
-// LOAD TWIG TEMPLATE
-// ---------------------------------------------------------
-echo $twig->render('BookingSuccess.html.twig', [
-    'hotel'       => $hotel,
-    'room_id'     => $room_id,
-    'room_type'   => $room_type,
-    'check_in'    => $check_in,
-    'check_out'   => $check_out,
-    'total_price' => $total_price,
-    'user'        => $user,
-    'bookings'    => $bookings,
+// rendering to twig template
+echo $twig->render('BookingSuccess.html.twig', 
+[
+    'hotel'            => $hotel,
+    'room_id'          => $room_id,
+    'room_type'        => $room_type,
+    'check_in'         => $check_in_str,
+    'check_out'        => $check_out_str,
+    'total_price'      => $total_price,
+    'user'             => $user,
+    'bookings'         => $bookings,
     'number_of_nights' => $number_of_nights
 ]);
 

@@ -5,46 +5,59 @@
     <title>My Bookings</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-[#F5F5DC] text-slate-800">
 
+<!-- Header -->
 {% include 'headerwithoutsearch.html.twig' %}
 
-<div class="container mx-auto p-6 max-w-3xl">
+{% set nav_links = 
+  [
+    { 'href': 'index.php', 'text': 'Home' }
+  ] %}
 
-    <h1 class="text-3xl font-bold mb-6"> Bookings </h1>
+{% include 'navigationmenu.html.twig' with {'nav_links': nav_links, 'user': user} %}
+
+<!-- Main Container -->
+<div class="max-w-5xl mx-auto p-6">
+
+    <h1 class="text-3xl sm:text-4xl font-extrabold mb-6 text-[#D4AF37]">My Bookings</h1>
 
     {% if bookings %}
-        <div class="space-y-4">
+        <div class="space-y-6">
             {% for b in bookings %}
-                <div class="bg-white shadow rounded-lg p-5 border border-gray-200">
-                    <h3 class="text-xl font-semibold">{{ b.Hotel_Name }}</h3>
-                    <p class="text-gray-600">City: {{ b.Hotel_City_Name }}</p>
-                    <p class="text-gray-600">Country: {{ b.Hotel_Country_Name }}</p>
-                    <br>
-                    <p><strong>Room Type:</strong> {{ b.Room_Type }}</p>
-                    <p><strong>Room Number:</strong> {{ b.Room_Number }}</p>
-                    <p><strong>Check-in:</strong> {{ b.Check_in|date("d-m-Y") }}</p>
-                    <p><strong>Check-out:</strong> {{ b.Check_out|date("d-m-Y") }}</p>
-                    <p><strong>Number of Nights:</strong> {{b.Nights}}</p>
-                    <p><strong>Total Paid:</strong> €{{ b.Total_Price }}</p>
+                <div class="bg-white shadow-lg rounded-xl p-6 border border-gray-200 hover:shadow-xl transition duration-300">
+                    <h3 class="text-2xl font-bold mb-2 text-[#D4AF37]">{{ b.Hotel_Name }}</h3>
+                    <p class="text-gray-700"><strong>City:</strong> {{ b.Hotel_City_Name }}</p>
+                    <p class="text-gray-700"><strong>Country:</strong> {{ b.Hotel_Country_Name }}</p>
 
-                    {% if b.Check_Out > "now"|date("d-m-Y") %}
-                        <p class="text-red-500 font-semibold mt-2">Past Booking</p>
+                    <div class="mt-3 space-y-1">
+                        <p><strong>Room Type:</strong> {{ b.Room_Type }}</p>
+                        <p><strong>Room Number:</strong> {{ b.Room_Number }}</p>
+                        <p><strong>Check-in:</strong> {{ b.Check_in|date("d-m-Y") }}</p>
+                        <p><strong>Check-out:</strong> {{ b.Check_out|date("d-m-Y") }}</p>
+                        <p><strong>Number of Nights:</strong> {{ b.Nights }}</p>
+                        <p><strong>Total Paid:</strong> €{{ b.Total_Price }}</p>
+                    </div>
+
+                    {% if b.Check_Out > "now"|date("Y-m-d") %}
+                        <p class="text-red-500 font-semibold mt-3">Past Booking</p>
                     {% else %}
-                        <p class="text-green-600 font-semibold mt-2">Upcoming Booking</p>
+                        <p class="text-green-600 font-semibold mt-3">Upcoming Booking</p>
                     {% endif %}
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <p class="text-gray-500">You have no bookings yet.</p>
+        <p class="text-gray-500 mt-4">You have no bookings yet.</p>
     {% endif %}
 
     <a href="index.php"
-       class="mt-6 inline-block px-6 py-3 bg-yellow-400 rounded hover:bg-yellow-500 text-black font-semibold">
+       class="mt-6 inline-block px-6 py-3 bg-[#D4AF37] hover:bg-[#B9972B] text-black font-bold rounded transition duration-300">
         Back to Home
-    </a>
+    </a>  
 
 </div>
+  {% include 'footer.html.twig'%}
+
 </body>
 </html>

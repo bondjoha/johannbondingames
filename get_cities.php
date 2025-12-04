@@ -1,17 +1,21 @@
 <?php
 include('databaseconnect.php');
 
-// Get the country 
-$country = $_POST['country'] ?? '';
+header('Content-Type: application/json'); // JSON response
+
+// Get and sanitize the country 
+$country = trim($_POST['country'] ?? '');
+$country = htmlspecialchars($country, ENT_QUOTES, 'UTF-8');
+
 if (!$country) 
 {
-    echo json_encode([]); // Return empty array if user do not select a country
+    echo json_encode([]); // Return empty array if no country selected
     exit;
 }
 
 try 
 {
-    // Obtain cities for the choosen country
+    // Obtain cities for the chosen country
     $stmt = $conn->prepare("
         SELECT DISTINCT Hotel_City_Name 
         FROM hotel_details 
@@ -26,7 +30,7 @@ try
 } 
 catch (PDOException $e) 
 {
-    // return empty array incase of an error
+    error_log($e->getMessage()); // optional logging
     echo json_encode([]);
 }
 

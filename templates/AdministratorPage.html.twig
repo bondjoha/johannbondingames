@@ -1,91 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hotel Management System - Admin</title>
-
-  <!-- Tailwind CSS (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management System - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>  <!-- Tailwind CSS CDN -->
 </head>
 
 <body class="bg-gray-100">
 
-  <!-- Header -->
-  <header class="text-white py-10 mb-6 px-4 text-center shadow-lg"
-    style="background: linear-gradient(90deg,#1e3c72,#2a5298);">
-    <h1 class="text-5xl font-bold mb-2">Hotel Management</h1>
-    <p class="text-xl">Welcome, {{ adminName }}</p>
-  </header>
+<!-- Header -->
+<div class="text-center py-6 mb-8 shadow-sm bg-[#D4AF37] text-white">
 
-  <!-- Logout -->
-  <div class="text-center mb-6">
-    <form method="POST" action="logout.php" class="inline-block">
-      <button type="submit"
-        class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-md text-lg inline-flex items-center gap-2">
-        Log Out
-      </button>
-    </form>
-  </div>
-
-  <!-- Dashboard -->
-  <div class="max-w-5xl mx-auto px-4">
-
-    {% if isApproved or role == 'admin' %}
-
-    <div class="bg-white shadow-lg p-8 rounded-xl mb-6">
-      <h2 class="text-3xl font-bold text-center mb-2">Administrator Dashboard</h2>
-      <p class="text-center text-gray-600">Select an action to manage the booking system:</p>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-
-        <!-- Hotels -->
-        <a href="Add_Read_Update_Delete_HotelsDetails.php"
-           class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
-          Hotels
-        </a>
-
-        <!-- Rooms -->
-        <a href="Add_Read_Update_Delete_Rooms.php"
-           class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
-          Rooms
-        </a>
-
-        <!-- Bookings -->
-        <a href="Add_Read_Update_Delete_Bookings.php"
-           class="bg-yellow-500 hover:bg-yellow-600 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
-         Bookings
-        </a>
-
+    <p class="text-2xl sm:text-3xl font-semibold mb-1">
         {% if role == 'admin' %}
-        <!-- Approvals -->
-        <a href="Add_Read_Update_Delete_Approvals.php"
-           class="bg-red-500 hover:bg-red-600 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
-         Approvals
-        </a>
+            {{ hotelName }}
+        {% else %}
+            Managing:
+            <span class="text-white font-bold">{{ hotelName }}</span>
         {% endif %}
+    </p>
 
-      </div>
+    <p class="text-sm sm:text-lg">
+        Role:
+        <span class="font-medium capitalize">{{ role }}</span>
+    </p>
+
+    <!-- Logout -->
+    <form method="POST" action="logout.php" class="mt-4 inline-block">
+        <button type="submit"
+            class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg shadow-md text-lg">
+            Log Out
+        </button>
+    </form>
+</div>
+
+
+    <!-- Main Container -->
+    <div class="max-w-5xl mx-auto px-4">
+
+        {% if isApproved or role == 'admin' %}
+
+            <!-- Dashboard Box -->
+            <div class="bg-white shadow-lg p-8 rounded-xl">
+
+                {% if role == 'admin' %}
+                    <h2 class="text-3xl font-bold text-center mb-2">Administrator Dashboard</h2>
+                    <p class="text-center text-gray-600">
+                        Select an action to manage the booking system:
+                    </p>
+
+                {% else %}
+                    <h2 class="text-3xl font-bold text-center mb-2 text-gray-800">
+                        {{ role|title }} Dashboard
+                    </h2>
+
+                    <p class="text-center text-gray-600 mb-2">
+                        Welcome {{ adminName }}
+                    </p>
+                {% endif %}
+
+                <!-- GRID BUTTONS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+
+                    {% if role == 'admin' %}
+                        <!-- Hotels -->
+                        <a href="Add_Read_Update_Delete_HotelsDetails.php"
+                        class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
+                            Hotels
+                        </a>
+
+                        <!-- Approvals -->
+                        <a href="Add_Read_Update_Delete_Approvals.php"
+                        class="bg-red-500 hover:bg-red-600 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
+                            Approvals
+                        </a>
+
+                        <!-- Users Credentials -->
+                        <a href="Add_Read_Update_Delete_Users_Credentials.php"
+                        class="bg-purple-600 hover:bg-purple-700 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
+                            Users Credentials
+                        </a>
+                    {% endif %}
+
+                    <!-- Rooms -->
+                    <a href="Add_Read_Update_Delete_Rooms.php"
+                    class="bg-green-600 hover:bg-green-700 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
+                        Rooms
+                    </a>
+
+                    <!-- Bookings -->
+                    <a href="Add_Read_Update_Delete_Bookings.php"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
+                        Bookings
+                    </a>
+
+                    <!-- index page -->
+                    <a href="index.php"
+                    class="bg-gray-500 hover:bg-yellow-600 text-white p-6 rounded-xl shadow-md flex items-center justify-center text-lg font-semibold transition">
+                        Index page
+                    </a>
+
+                </div>
+            </div>
+        <!-- if user role is staff is not approved-->
+        {% else %}
+
+            <!-- Pending Approval -->
+            <div class="bg-orange-100 border-l-4 border-orange-600 text-orange-900 p-6 rounded-lg shadow-md">
+                <p class="font-bold text-lg">Awaiting Approval</p>
+                <p class="text-sm mt-1">
+                    Your request to access the backoffice is still awaiting approval.
+                    Thank you for your patience.
+                </p>
+            </div>
+
+        {% endif %}
     </div>
-
-    {% else %}
-
-    <!-- Pending Approval Alert -->
-    <div class="bg-orange-100 border-l-4 border-orange-600 text-orange-900 p-6 rounded-lg">
-      <div class="flex items-start">
-        <div>
-          <p class="font-bold text-lg">Awaiting Approval</p>
-          <p class="text-sm mt-1">
-            Kindly note that your request to use the backoffice is currently awaiting approval.  We kindly request you to be patient!
-          </p>
-        </div>
-      </div>
-    </div>
-
-    {% endif %}
-
-  </div>
 
 </body>
 </html>

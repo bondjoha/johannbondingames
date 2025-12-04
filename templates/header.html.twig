@@ -1,7 +1,7 @@
 <header class="bg-[#D4AF37] text-white">
 
   <!-- Top Bar -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+  <div class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
     <div class="flex items-center justify-between gap-6">
 
       <!-- Logo -->
@@ -41,7 +41,7 @@
 
                   <!-- Dropdown menu -->
                   <div id="user-profile-menu" class="hidden absolute right-0 mt-2 w-36 bg-white text-slate-800 rounded-lg shadow-lg flex-col z-50 py-1">
-                      <a href="profile.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Edit Profile</a>
+                      <a href="EditUserProfile.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Edit Profile</a>
                       <a href="bookingHistory.php" class="block px-4 py-2 text-sm hover:bg-gray-100">My Bookings</a>
                       <form method="POST" action="logout.php">
                           <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Logout</button>
@@ -59,44 +59,44 @@
   </div>
 
   <!-- Search Bar -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-    <div class="bg-[#F5F5DC] rounded-lg p-4 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <div class="bg-[#F5F5DC] rounded-lg p-4 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-      <form method="POST" id="headerSearchForm" class="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch flex-1">
+        <form method="POST" id="headerSearchForm" class="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch flex-1">
 
-        <!-- Country -->
-        <div class="w-full md:w-48 bg-white rounded px-3 py-2 text-slate-800">
-          <label class="block text-xs font-semibold mb-1">Country</label>
-          <select name="country" id="country-select" class="w-full bg-transparent outline-none text-sm text-slate-800">
-            <option value="">Select Country</option>
-            {% for c in countries %}
-              <option value="{{ c.Hotel_Country_Name }}" {% if c.Hotel_Country_Name == country %}selected{% endif %}>
-                {{ c.Hotel_Country_Name }}
-              </option>
+          <!-- Country -->
+          <div class="w-full md:w-48 bg-white rounded px-3 py-2 text-slate-800">
+            <label class="block text-xs font-semibold mb-1">Country</label>
+            <select name="country" id="country-select" class="w-full bg-transparent outline-none text-sm text-slate-800">
+              <option value=""  selected="selected">Select Country</option>
+              {% for c in countries %}
+                <option value="{{ c.Hotel_Country_Name }}" {% if c.Hotel_Country_Name == country %}selected{% endif %}>
+                  {{ c.Hotel_Country_Name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+        <!-- City -->
+        <div class="w-full md:w-48 bg-white rounded px-3 py-2 text-slate-800" id="city-wrapper">
+          <label class="block text-xs font-semibold mb-1">City</label>
+          <select name="city" id="city-select" class="w-full bg-transparent outline-none text-sm text-slate-800">
+            <option value="" selected="selected">Select City</option>
+            {% for c in cities %}
+                <option value="{{ c.Hotel_City_Name }}" {% if c.Hotel_City_Name == city %}selected{% endif %}>
+                    {{ c.Hotel_City_Name }}
+                </option>
             {% endfor %}
           </select>
         </div>
 
-       <!-- City -->
-      <div class="w-full md:w-48 bg-white rounded px-3 py-2 text-slate-800" id="city-wrapper">
-        <label class="block text-xs font-semibold mb-1">City</label>
-        <select name="city" id="city-select" class="w-full bg-transparent outline-none text-sm text-slate-800">
-          <option value="">Select City</option>
-          {% for c in cities %}
-              <option value="{{ c.Hotel_City_Name }}" {% if c.Hotel_City_Name == city %}selected{% endif %}>
-                  {{ c.Hotel_City_Name }}
-              </option>
-          {% endfor %}
-        </select>
-      </div>
-
       <!-- Star Rating -->
       <div class="w-full md:w-32 bg-white rounded px-3 py-2 text-slate-800">
           <label class="block text-xs font-semibold mb-1">Star Rating</label>
-          <select name="star_rating" class="w-full bg-transparent outline-none text-sm text-slate-800">
+          <select id="star-select" name="star_rating" class="w-full bg-transparent outline-none text-sm text-slate-800">
               <option value="">Any</option>
               {% for i in 1..5 %}
-                  <option value="{{ i }}" {% if i == star_rating|default('') %}selected{% endif %}>
+                  <option value="{{ i }}" {% if i == star_rating %}selected{% endif %}>
                       {{ i }} Star{% if i > 1 %}s{% endif %}
                   </option>
               {% endfor %}
@@ -146,4 +146,6 @@
 <script src="javascripts/citiesdropdown.js"></script>
 <script src="javascripts/checkinoutdatesvalidation.js"></script>
 <script src="javascripts/profileMenu.js"></script>
+<!--<script src="javascripts/starRatingsSearch.js"></script>-->
+
 

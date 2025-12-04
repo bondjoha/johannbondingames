@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Profile - Hotel Booking</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F5F5DC] text-slate-800">
+
+  {% include 'headerwithoutsearch.html.twig' %}
+
+  {% set nav_links = [
+    { 'href': 'index.php', 'text': 'Home' }
+  ] %}
+
+  {% include 'navigationmenu.html.twig' with {'nav_links': nav_links, 'user': user} %}
+
+  <section class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-lg">
+      <h2 class="text-2xl font-bold mb-6 text-[#D4AF37]">Update Profile</h2>
+
+      {% if message %}
+          <div class="mb-4 p-3 rounded text-white {{ message matches '/success/i' ? 'bg-green-500' : 'bg-red-500' }}">
+              {{ message }}
+          </div>
+      {% endif %}
+
+      <form method="POST" class="space-y-4">
+
+          <!-- First Name -->
+          <div>
+              <label class="block text-sm font-semibold mb-1">First Name</label>
+              <input type="text" name="first_name" value="{{ user.first_name }}" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#D4AF37]" required>
+          </div>
+
+          <!-- Last Name -->
+          <div>
+              <label class="block text-sm font-semibold mb-1">Last Name</label>
+              <input type="text" name="last_name" value="{{ user.last_name }}" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#D4AF37]" required>
+          </div>
+
+          <!-- Email -->
+          <div>
+              <label class="block text-sm font-semibold mb-1">Email</label>
+              <input type="email" name="email" value="{{ user.user_email }}" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#D4AF37]" required>
+          </div>
+
+          <!-- Phone -->
+          <div>
+              <label class="block text-sm font-semibold mb-1">Phone Number</label>
+              <input type="text" name="phone" value="{{ user.phone_number }}" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#D4AF37]">
+          </div>
+
+          <!-- Password Section -->
+          <h3 class="text-lg font-semibold mt-6 mb-2 text-[#D4AF37]">Change Password (optional)</h3>
+
+          <!-- Old Password -->
+          <div>
+              <label class="block text-sm font-semibold mb-1">Old Password</label>
+              <input type="password" name="old_password" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#D4AF37]" placeholder="Enter old password to change">
+          </div>
+
+          <!-- New Password -->
+          <div class="relative">
+              <label class="block text-sm font-semibold mb-1">New Password</label>
+              <input type="password" id="password" name="new_password"
+                  class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#D4AF37]"
+                  placeholder="Enter new password">
+
+              <!-- Toggle password visibility -->
+              <span id="togglePassword" class="absolute right-3 top-9 cursor-pointer text-yellow-500">👁</span>
+
+              <!-- Password requirement warning -->
+              <p id="password-warning" class="text-red-600 text-sm mt-1 hidden">
+                  Password must be at least 8 characters, include:
+                  <ul class="list-disc ml-5">
+                      <li>1 uppercase letter</li>
+                      <li>1 lowercase letter</li>
+                      <li>1 number</li>
+                      <li>1 special character</li>
+                  </ul>
+              </p>
+          </div>
+
+          <!-- Confirm New Password -->
+          <div class="relative">
+              <label class="block text-sm font-semibold mb-1">Confirm New Password</label>
+              <input type="password" name="confirm_password" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#D4AF37]" placeholder="Confirm new password">
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="w-full md:w-auto px-6 py-2 bg-[#D4AF37] text-black font-bold rounded hover:bg-[#B9972B]">
+              Update Profile
+          </button>
+
+      </form>
+  </section>
+
+  {% include 'footer.html.twig' %}
+
+  <!-- Include togglePassword.js -->
+  <script src="javascripts/togglePassword.js"></script>
+
+</body>
+</html>
