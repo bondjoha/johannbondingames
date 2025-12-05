@@ -15,7 +15,7 @@ $twig   = new \Twig\Environment($loader, ['autoescape' => 'html']);
 $user = $_SESSION['user'] ?? null;
 $isAdmin = ($user && isset($user['role']) && strtolower($user['role']) === 'admin');
 
-// Retrieve search parameters: POST -> GET -> SESSION -> default
+// Retrieve search parameters. First try with  POST then with GET then with SESSION -> default
 $country     = trim($_POST['country'] ?? $_GET['country'] ?? $_SESSION['selected_country'] ?? '');
 $city        = trim($_POST['city'] ?? $_GET['city'] ?? $_SESSION['selected_city'] ?? '');
 $star_rating = trim($_POST['star_rating'] ?? $_GET['star_rating'] ?? $_SESSION['selected_star'] ?? '');

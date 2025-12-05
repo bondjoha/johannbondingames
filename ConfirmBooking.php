@@ -39,6 +39,8 @@ $check_in    = DateTime::createFromFormat('Y-m-d', $_POST['check_in'] ?? '');
 $check_out   = DateTime::createFromFormat('Y-m-d', $_POST['check_out'] ?? '');
 $room_type   = htmlspecialchars($_POST['room_type'] ?? '');
 
+
+
 if (!$hotel_id || !$room_id || !$total_price || !$check_in || !$check_out || !$room_type) 
 {
     die("Missing or invalid booking information.");
@@ -48,6 +50,12 @@ if (!$hotel_id || !$room_id || !$total_price || !$check_in || !$check_out || !$r
 $check_in_str  = $check_in->format('Y-m-d');
 $check_out_str = $check_out->format('Y-m-d');
 
+
+$stmt = $conn->prepare("SELECT Price FROM hotels_rooms WHERE Room_Id = ?");
+$stmt->execute([$room_id]);
+$roomPriceData = $stmt->fetch(PDO::FETCH_ASSOC);
+$pricePerNight = $roomPriceData['Price'] ?? 0;
+
 try
 {
     $conn->beginTransaction();
@@ -55,14 +63,15 @@ try
     $stmt = $conn->prepare
     ("
         INSERT INTO booking 
-        (User_Id, Hotel_Id, Room_Id, Room_Type, Check_In, Check_Out, Total_Price, Booking_Date)
-        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+        (User_Id, Hotel_Id, Room_Id, Room_Type, Price_Per_Night, Check_In, Check_Out, Total_Price, Booking_Date)
+        VALUES (?, ?, ?, ?, ?, ?, ?,?, NOW())
     ");
     $stmt->execute([
         $user_id,
         $hotel_id,
         $room_id,
         $room_type,
+        $pricePerNight,
         $check_in_str,
         $check_out_str,
         $total_price
@@ -88,6 +97,14 @@ $stmt = $conn->prepare
 $stmt->execute([$user_id]);
 $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// retrieving booked room info
+$stmt = $conn->prepare("SELECT Room_Number FROM hotels_rooms WHERE Room_Id = ?");
+$stmt->execute([$room_id]);
+$room = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$room_number = $room['Room_Number'] ?? 'N/A';
+
+
 // Calculate number of nights safely
 $checkInDate  = $check_in;
 $checkOutDate = $check_out;
@@ -111,8 +128,10 @@ echo $twig->render('BookingSuccess.html.twig',
     'hotel'            => $hotel,
     'room_id'          => $room_id,
     'room_type'        => $room_type,
+    'room_number'      => $room_number,
     'check_in'         => $check_in_str,
     'check_out'        => $check_out_str,
+    'pricePerNight'    => $pricePerNight,
     'total_price'      => $total_price,
     'user'             => $user,
     'bookings'         => $bookings,

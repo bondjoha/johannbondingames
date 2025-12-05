@@ -104,6 +104,8 @@ $interval     = $checkInDate->diff($checkOutDate);
 $nights       = $interval->days;
 $totalPrice   = $room['Price'] * $nights;
 
+//var_dump($room);
+
 // Rendering to Twig BookingPage.html.twig
 echo $twig->render('BookingPage.html.twig', 
 [
