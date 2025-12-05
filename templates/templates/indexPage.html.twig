@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hotel Booking</title>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="index-page bg-[#F5F5DC] text-slate-800">
+{% include 'header.html.twig' %}
+<!-- Video Slider-->
+<section class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
+  <div class="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
+    <!-- Slides -->
+    <div id="sliderContainer" class="w-full h-full relative">
+      <!-- Slide 1 -->
+      <video class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-100" autoplay muted loop id="slide1">
+        <source src="indeximages/video1.mp4" type="video/mp4">
+      </video>
+      <div class="absolute inset-0 bg-black/30 flex flex-col justify-center items-start p-6 text-white transition-opacity duration-1000" id="text1">
+        <h2 class="text-3xl sm:text-5xl font-extrabold mb-2">Discover Paradise</h2>
+        <p class="text-lg sm:text-2xl mb-4">Experience luxury and comfort in every stay</p>
+      </div>
+      <!-- Slide 1 -->
+      <video class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" autoplay muted loop id="slide2">
+        <source src="indeximages/video2.mp4" type="video/mp4">
+      </video>
+      <div class="absolute inset-0 bg-black/30 flex flex-col justify-center items-start p-6 text-white transition-opacity duration-1000" id="text2">
+        <h2 class="text-3xl sm:text-5xl font-extrabold mb-2">Unforgettable Stays</h2>
+        <p class="text-lg sm:text-2xl mb-4">Luxury hotels with amazing views and amenities</p>
+      </div>
+      <!-- Slide 2 -->
+      <video class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0" autoplay muted loop id="slide3">
+        <source src="indeximages/video3.mp4" type="video/mp4">
+      </video>
+      <div class="absolute inset-0 bg-black/30 flex flex-col justify-center items-start p-6 text-white transition-opacity duration-1000" id="text3">
+        <h2 class="text-3xl sm:text-5xl font-extrabold mb-2">Your Dream Hotel</h2>
+        <p class="text-lg sm:text-2xl mb-4">Book the perfect getaway today</p>
+      </div>
+  </div>
+</section>
+<script src="javascripts/indexpageslider.js"></script>
+
+<!--  Promotional deals  -->
+<section class="bg-[#F5F5DC] py-12">
+  <div class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-3xl sm:text-4xl font-extrabold text-[#D4AF37] mb-8 text-center">Special Offers & Deals</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Promotion 1 -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <img src="indeximages/hotel1.jpg" alt="Hotel 1" class="w-full h-56 object-cover">
+        <div class="p-4">
+          <h3 class="text-xl font-bold mb-2">Austria Hotels</h3>
+          <p class="text-gray-700 mb-2">
+            Rooms starting from <span class="text-[#D4AF37] font-bold">€100/night</span>
+          </p>
+          <form action="searchresult.php" method="POST">
+            <input type="hidden" name="country" value="Austria">
+            <button type="submit"
+              class="inline-block bg-[#D4AF37] text-black font-semibold px-4 py-2 rounded hover:bg-[#B9972B]">
+                Book Now
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Promotion 2 -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <img src="indeximages/hotel2.jpg" alt="Hotel 2" class="w-full h-56 object-cover">
+        <div class="p-4">
+          <h3 class="text-xl font-bold mb-2">Malta Hotels</h3>
+          <p class="text-gray-700 mb-2">
+            Rooms starting from <span class="text-[#D4AF37] font-bold">€59/night</span>
+          </p>
+          <form action="searchresult.php" method="POST">
+            <input type="hidden" name="country" value="Malta">
+            <button type="submit"
+              class="inline-block bg-[#D4AF37] text-black font-semibold px-4 py-2 rounded hover:bg-[#B9972B]">
+                Book Now
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Promotion 3 -->
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <img src="indeximages/hotel3.jpg" alt="Hotel 3" class="w-full h-56 object-cover">
+        <div class="p-4">
+          <h3 class="text-xl font-bold mb-2">England Hotels</h3>
+          <p class="text-gray-700 mb-2">
+            Rooms starting from <span class="text-[#D4AF37] font-bold">€100
+          <form action="searchresult.php" method="POST">
+            <input type="hidden" name="country" value="England">
+            <button type="submit"
+              class="inline-block bg-[#D4AF37] text-black font-semibold px-4 py-2 rounded hover:bg-[#B9972B]">
+                Book Now
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+{% include 'footer.html.twig' %}
+
+</body>
+</html>

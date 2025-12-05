@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"> <!-- character encoding for proper displaying -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Makes page responsive for mobile displays-->
+<title>Room Management</title> <!-- browser tab tite -->
+<script src="https://cdn.tailwindcss.com"></script> <!-- tailwind CSS to be used for the styling -->
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+<div class="container mx-auto py-8">
+
+    <!--Web page  Header -->
+    <header class="mb-6 text-center bg-gray-700 text-white py-6 rounded shadow">
+        {% if selectedHotelName %}
+            <h1 class="text-3xl font-bold">{{ selectedHotelName|e }}</h1>
+        {% endif %}
+        <h1 class="text-3xl font-bold">Room Management</h1>
+    </header>
+
+    <!-- Navigation bar to link to administrator page and log out -->
+    <nav class="mb-6 bg-gray-600 text-white py-2 rounded shadow flex items-center space-x-4 px-4">
+        <a href="Administrator.php" class="hover:text-gray-200 font-medium">Administrator Page</a>
+        <form action="logout.php" method="POST" class="inline">
+            <button type="submit" class="hover:text-gray-200 font-medium">Logout</button>
+        </form>
+    </nav>
+
+    <!--Display messages -->
+    {% if message %}
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-center">
+            {{ message }}
+        </div>
+    {% endif %}
+    {% if error %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <!-- Search by room number -->
+    <form method="GET" class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-center">
+        <input type="text" name="searchRoomNumber" value="{{ searchRoomNumber }}" placeholder="Search by Room Number"
+               class="p-2 rounded border w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        <button type="submit" class="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 font-semibold">Search</button>
+    </form>
+
+    <!-- Hotel filter by hotel name for user admin -->
+    {% if isAdmin %}
+        <form method="POST" class="mb-6 flex justify-center gap-4">
+            <select name="hotel_filter" class="p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                <option value="">-- Select Hotel --</option>
+                {% for hotel in hotels %}
+                    <option value="{{ hotel.Hotel_Id }}" {% if hotel.Hotel_Id == selectedHotel %}selected{% endif %}>
+                        {{ hotel.Hotel_Name|e }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 font-semibold">Filter</button>
+        </form>
+    {% endif %}
+
+    <!-- Add new room record -->
+    <div class="bg-white p-6 mb-8 rounded shadow">
+        <h2 class="text-xl font-semibold mb-4">Add New Room</h2>
+        <form method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- if the user role is admin show all hotels but if staff hide it -->
+            {% if isAdmin %}
+            <div>
+                <label class="block font-medium mb-1">Select Hotel</label>
+                <select name="Hotel_Id" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                    <option value="">-- Select Hotel --</option>
+                    {% for hotel in hotels %}
+                        <option value="{{ hotel.Hotel_Id }}">{{ hotel.Hotel_Name|e }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% else %}
+                <input type="hidden" name="Hotel_Id" value="{{ selectedHotel }}">
+            {% endif %}
+            <!-- Room number  -->
+            <div>
+                <label class="block font-medium mb-1">Room Number</label>
+                <input type="text" name="Room_Number" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+            </div>
+            <!--Room Type  -->
+            <div>
+                <label class="block font-medium mb-1">Room Type</label>
+                <select name="Room_Type" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                    <option value="Standard">Standard</option>
+                    <option value="Deluxe">Deluxe</option>
+                    <option value="Suite">Suite</option>
+                </select>
+            </div>
+            <!-- Price -->
+            <div>
+                <label class="block font-medium mb-1">Price (€)</label>
+                <input type="number" name="Room_Price" step="0.01" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            </div>
+            <!-- Room dimension -->
+            <div>
+                <label class="block font-medium mb-1">Room Square Meter</label>
+                <input type="number" name="Room_Square_Meter" step="0.1" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+            </div>
+            <!-- Status -->
+            <div>
+                <label class="block font-medium mb-1">Status</label>
+                <select name="Room_Status" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    <option value="Available">Available</option>
+                    <option value="Booked">Booked</option>
+                    <option value="Maintenance">Maintenance</option>
+                </select>
+            </div>
+            <!-- Bed type -->
+            <div>
+                <label class="block font-medium mb-1">Bed Type</label>
+                <input type="text" name="Bed_Type" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+            </div>
+            <!-- Is Active -->
+            <div>
+                <label class="block font-medium mb-1">Active</label>
+                <select name="Is_Active" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            <!-- Images -->
+            <div>
+                <label class="block font-medium mb-1">Room Images</label>
+                <input type="file" name="Image1" accept="image/*" class="mb-2">
+                <input type="file" name="Image2" accept="image/*" class="mb-2">
+                <input type="file" name="Image3" accept="image/*">
+            </div>
+
+            <div class="col-span-1 md:col-span-3">
+                <button type="submit" name="submitRoomRecord" class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 w-full md:w-auto">Add Room</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Room cards -->
+    {% if rooms|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for room in rooms %}
+        <form method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
+            <div>
+                <h3 class="text-lg font-bold mb-1">{{ room.Hotel_Name|e }}</h3>
+
+                <label class="block font-medium mt-2">Room Number</label>
+                <input type="text" name="Room_Number" value="{{ room.Room_Number|e }}" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+
+                <label class="block font-medium mt-2">Room Type</label>
+                <select name="Room_Type" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    <option value="Standard" {% if room.Room_Type=='Standard' %}selected{% endif %}>Standard</option>
+                    <option value="Deluxe" {% if room.Room_Type=='Deluxe' %}selected{% endif %}>Deluxe</option>
+                    <option value="Suite" {% if room.Room_Type=='Suite' %}selected{% endif %}>Suite</option>
+                </select>
+
+                <label class="block font-medium mt-2">Price (€)</label>
+                <input type="number" name="Room_Price" value="{{ room.Price|e }}" step="0.01" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+
+                <label class="block font-medium mt-2">Square Meter</label>
+                <input type="number" name="Room_Square_Meter" value="{{ room.Room_Square_Meter|e }}" step="0.1" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+
+                <label class="block font-medium mt-2">Status</label>
+                <select name="Room_Status" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    <option value="Available" {% if room.Status=='Available' %}selected{% endif %}>Available</option>
+                    <option value="Booked" {% if room.Status=='Booked' %}selected{% endif %}>Booked</option>
+                    <option value="Maintenance" {% if room.Status=='Maintenance' %}selected{% endif %}>Maintenance</option>
+                </select>
+
+                <label class="block font-medium mt-2">Bed Type</label>
+                <input type="text" name="Bed_Type" value="{{ room.Bed_Type|e }}" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+
+                <label class="block font-medium mt-2">Active</label>
+                <select name="Is_Active" class="w-full p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    <option value="1" {% if room.Is_Active %}selected{% endif %}>Yes</option>
+                    <option value="0" {% if not room.Is_Active %}selected{% endif %}>No</option>
+                </select>
+
+                <label class="block font-medium mt-2">Update Images (optional)</label>
+                <input type="file" name="Image1" accept="image/*" class="mb-2">
+                <input type="file" name="Image2" accept="image/*" class="mb-2">
+                <input type="file" name="Image3" accept="image/*">
+
+                <!-- Display Rooms images if availiable-->
+                <div class="mt-2 flex gap-2 flex-wrap">
+                    {% if room.Image1 %}
+                        <img src="{{ room.Image1|e }}" alt="Room Image 1" class="w-20 h-20 object-cover rounded">
+                    {% endif %}
+                    {% if room.Image2 %}
+                        <img src="{{ room.Image2|e }}" alt="Room Image 2" class="w-20 h-20 object-cover rounded">
+                    {% endif %}
+                    {% if room.Image3 %}
+                        <img src="{{ room.Image3|e }}" alt="Room Image 3" class="w-20 h-20 object-cover rounded">
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4 flex gap-2 flex-wrap">
+                <!-- data submitted to the controller but not shown on the webpage -->
+                <input type="hidden" name="Room_Id" value="{{ room.Room_Id }}">
+                <input type="hidden" name="Hotel_Id" value="{{ room.Hotel_Id }}">
+                <!-- buttons to submit -->
+                <button type="submit" name="updateroom" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 w-full md:w-auto">Save</button>
+                <button type="submit" name="deleteroom" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 w-full md:w-auto" onclick="return confirm('Hide this room?');">Hide</button>
+            </div>
+        </form>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="text-center text-gray-700 mt-4">No rooms found.</p>
+    {% endif %}
+
+</div>
+</body>
+</html>

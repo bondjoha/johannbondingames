@@ -1,0 +1,151 @@
+<header class="bg-[#D4AF37] text-white">
+
+  <!-- Top Bar -->
+  <div class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex items-center justify-between gap-6">
+
+      <!-- Logo -->
+      <a href="index.php" class="flex items-center gap-3 whitespace-nowrap">
+        <div class="w-35 h-10 flex items-center justify-center rounded bg-white/10 text-white font-bold text-lg">
+          Hotel Booking System
+        </div>
+      </a>
+
+      <!-- Hero Text -->
+      <div class="flex flex-col text-left leading-tight">
+        <h1 class="text-3xl sm:text-5xl font-extrabold">Find your next stay</h1>
+        <p class="text-lg sm:text-2xl opacity-90 mt-1">Luxury hotels with unforgettable experiences</p>
+      </div>
+
+      <!-- User/Admin -->
+      <div class="relative flex items-center gap-3 whitespace-nowrap">
+          {% if isAdmin %}
+              <a href="Administrator.php" class="text-yellow-300 font-semibold hover:text-yellow-400 hidden md:block">
+                  Administration
+              </a>
+          {% endif %}
+
+          {% if user %}
+              <span class="hidden sm:inline-block text-sm font-medium mr-2">
+                  Hello, {{ user.first_name }} {{ user.last_name }}
+              </span>
+
+              <!-- Profile Button -->
+              <div class="relative">
+                  <button id="user-profile-btn" class="bg-white text-[#D4AF37] p-1 rounded hover:bg-gray-100 focus:outline-none">
+                      <!-- Simple burger icon -->
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                  </button>
+
+                  <!-- Dropdown menu -->
+                  <div id="user-profile-menu" class="hidden absolute right-0 mt-2 w-36 bg-white text-slate-800 rounded-lg shadow-lg flex-col z-50 py-1">
+                      <a href="EditUserProfile.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Edit Profile</a>
+                      <a href="bookingHistory.php" class="block px-4 py-2 text-sm hover:bg-gray-100">My Bookings</a>
+                      <form method="POST" action="logout.php">
+                          <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Logout</button>
+                      </form>
+                  </div>
+              </div>
+
+          {% else %}
+              <a href="Login.php" class="px-3 py-1.5 rounded bg-white text-[#D4AF37] font-semibold hover:opacity-95">Login</a>
+              <a href="Registration.php" class="px-3 py-1.5 rounded bg-white text-[#D4AF37] font-semibold hover:opacity-95">Register</a>
+          {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <div class="bg-[#F5F5DC] rounded-lg p-4 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+        <form method="POST" id="headerSearchForm" class="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch flex-1">
+
+          <!-- Country -->
+          <div class="w-full md:w-48 bg-white rounded px-3 py-2 text-slate-800">
+            <label class="block text-xs font-semibold mb-1">Country</label>
+            <select name="country" id="country-select" class="w-full bg-transparent outline-none text-sm text-slate-800">
+              <option value=""  selected="selected">Select Country</option>
+              {% for c in countries %}
+                <option value="{{ c.Hotel_Country_Name }}" {% if c.Hotel_Country_Name == country %}selected{% endif %}>
+                  {{ c.Hotel_Country_Name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+        <!-- City -->
+        <div class="w-full md:w-48 bg-white rounded px-3 py-2 text-slate-800" id="city-wrapper">
+          <label class="block text-xs font-semibold mb-1">City</label>
+          <select name="city" id="city-select" class="w-full bg-transparent outline-none text-sm text-slate-800">
+            <option value="" selected="selected">Select City</option>
+            {% for c in cities %}
+                <option value="{{ c.Hotel_City_Name }}" {% if c.Hotel_City_Name == city %}selected{% endif %}>
+                    {{ c.Hotel_City_Name }}
+                </option>
+            {% endfor %}
+          </select>
+        </div>
+
+      <!-- Star Rating -->
+      <div class="w-full md:w-32 bg-white rounded px-3 py-2 text-slate-800">
+          <label class="block text-xs font-semibold mb-1">Star Rating</label>
+          <select id="star-select" name="star_rating" class="w-full bg-transparent outline-none text-sm text-slate-800">
+              <option value="">Any</option>
+              {% for i in 1..5 %}
+                  <option value="{{ i }}" {% if i == star_rating %}selected{% endif %}>
+                      {{ i }} Star{% if i > 1 %}s{% endif %}
+                  </option>
+              {% endfor %}
+          </select>
+      </div>
+
+        <!-- Check-in -->
+        <div class="w-full md:w-44 bg-white rounded px-3 py-2 text-slate-800">
+          <label class="block text-xs font-semibold mb-1">Check-in</label>
+          <input
+              id="check-in"
+              name="check_in"
+              type="date"
+              class="w-full bg-transparent outline-none text-sm text-slate-800"
+              value="{{ check_in|default('') }}"
+              min="{{ "now"|date("Y-m-d") }}"
+          >
+        </div>
+
+        <!-- Check-out -->
+        <div class="w-full md:w-44 bg-white rounded px-3 py-2 text-slate-800">
+          <label class="block text-xs font-semibold mb-1">Check-out</label>
+          <input
+              id="check-out"
+              name="check_out"
+              type="date"
+              class="w-full bg-transparent outline-none text-sm text-slate-800"
+              value="{{ check_out|default('') }}"
+              min="{{ check_in|default("now"|date("Y-m-d")) }}"
+          >
+        </div>
+
+        <button type="submit"
+            formaction="searchresult.php"
+            class="w-full md:w-auto inline-flex items-center gap-2 justify-center px-6 py-3 rounded bg-[#D4AF37] hover:bg-[#B9972B] text-black font-bold">
+            Search
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+
+</header>
+
+<!-- JS -->
+<script src="javascripts/citiesdropdown.js"></script>
+<script src="javascripts/checkinoutdatesvalidation.js"></script>
+<script src="javascripts/profileMenu.js"></script>
+<!--<script src="javascripts/starRatingsSearch.js"></script>-->
+
+

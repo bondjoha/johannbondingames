@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Booking - Sign In</title>
+<script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script> <!-- FOR RECAPTCHA -->
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+{% include 'headerwithoutsearch.html.twig' with { 'nav_links': nav_links } %}
+
+{% set nav_links = 
+[
+    { 'href': 'Index.php', 'text': 'Home' }
+] 
+%}
+
+{% include 'navigationmenu.html.twig' with { 'nav_links': nav_links, 'user': user } %}
+
+<!-- Login -->
+<main class="flex items-center justify-center min-h-screen px-4">
+  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Sign In</h2>
+
+    <!-- in case the  credentials are incorrect display email or password are invalid-->
+    {% if error %}
+      <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-center">
+        Invalid email or password. Please try again.
+      </div>
+    {% endif %}
+
+    <form method="POST" action="" class="space-y-4">
+      <!-- Email textfield box -->
+      <div>
+        <label class="block text-sm font-semibold mb-1">Email</label>
+        <input type="email" name="user_email" required
+               class="w-full px-3 py-2 border rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+               placeholder="Email address" autocomplete="email">
+      </div>
+
+    <!-- Password textfield box -->
+    <div class="relative">
+      <label class="block text-sm font-semibold mb-1">Password</label>
+      <input type="password" id="password" name="user_password" required
+            class="w-full px-3 py-2 border rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            placeholder="Password" autocomplete="current-password">
+      <span id="togglePassword" class="absolute right-3 top-9 cursor-pointer text-yellow-500">👁</span>
+
+    </div>
+
+      <!-- search input entered bythe guest which will be hidden for post log in that will be used in the next page --> 
+      {% if hotel_id is defined %}
+        <input type="hidden" name="hotel_id" value="{{ hotel_id }}">
+      {% endif %}
+      {% if room_type is defined %}
+        <input type="hidden" name="room_type" value="{{ room_type }}">
+      {% endif %}
+      {% if check_in is defined %}
+        <input type="hidden" name="check_in" value="{{ check_in }}">
+      {% endif %}
+      {% if check_out is defined %}
+        <input type="hidden" name="check_out" value="{{ check_out }}">
+      {% endif %}
+      {% if country is defined %}
+        <input type="hidden" name="country" value="{{ country }}">
+      {% endif %}
+      {% if city is defined %}
+        <input type="hidden" name="city" value="{{ city }}">
+      {% endif %}
+      {% if star_rating is defined %}
+        <input type="hidden" name="star_rating" value="{{ star_rating }}">
+      {% endif %}
+
+      <!-- Recaptcha -->
+      <div class="g-recaptcha" data-sitekey="6LejTR8sAAAAADW7bYyHO6EDksAnttva6oJWYb1C"></div>
+
+      {% if captcha_error %}
+        <p class="text-red-600 text-sm mt-1 text-center">{{ captcha_error }}</p>
+      {% endif %}
+
+      <button type="submit"
+              class="w-full py-2 px-4 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded shadow">
+        Login
+      </button>
+
+    </form>
+
+    <p class="text-center text-sm mt-4">
+      Don’t have an account? <a href="Registration.php" class="text-yellow-500 hover:underline">Register here</a>
+    </p>
+  </div>
+</main>
+
+<script src="javascripts/togglePassword.js"></script>
+{% include 'footer.html.twig'%}
+</body>
+</html>
