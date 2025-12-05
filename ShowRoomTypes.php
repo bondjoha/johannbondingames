@@ -139,13 +139,16 @@ foreach ($roomTypes as &$room)
 }
 unset($room);
 
+
+
 // save pending bookings if not logged in
 if (!$user && !empty($roomTypes)) 
 {
-    $firstRoomType = $roomTypes[0]['Room_Type'] ?? null;
-    $firstRoom     = $roomTypes[0]['available_rooms'][0]['Room_Id'] ?? null;
+   $firstRoomType = $roomTypes[0]['Room_Type'] ?? null;
+   $firstRoom     = $roomTypes[0]['available_rooms'][0]['Room_Id'] ?? null;
 
-    $_SESSION['pending_booking'] = [
+    $_SESSION['pending_booking'] = 
+    [
         'hotel_id'    => $hotel_id,
         'room_id'     => $firstRoom,
         'room_type'   => $firstRoomType,
@@ -156,9 +159,12 @@ if (!$user && !empty($roomTypes))
         'star_rating' => $star_rating,
         
     ];
+  
 }
 // Include weather API data
 include 'weatherApiOneHotel.php';
+
+
 // Render to Twig
 echo $twig->render('ShowRoomTypes.html.twig', 
 [

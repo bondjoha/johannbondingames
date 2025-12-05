@@ -1,6 +1,8 @@
 <?php
 require 'configure.php';
-session_start(); // Ensure session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Twig setup
 use Twig\Environment;
@@ -45,7 +47,7 @@ $country     = $_POST['country']     ?? $_GET['country'] ?? '';
 $city        = $_POST['city']        ?? $_GET['city'] ?? '';
 $star_rating = $_POST['star_rating'] ?? $_GET['star_rating'] ?? '';
 
-// Validate booking inputs
+// Validate and filtering booking inputs
 $hotel_id    = filter_var($hotel_id, FILTER_VALIDATE_INT);
 $room_id     = filter_var($room_id, FILTER_VALIDATE_INT);
 $star_rating = filter_var($star_rating, FILTER_VALIDATE_INT);

@@ -90,7 +90,6 @@
           </p>
         </div>
 
-
         <!-- User Role -->
         <div class="relative">
           <label for="user_role" class="block text-sm font-semibold mb-1">User Role</label>
@@ -102,6 +101,12 @@
           </select>
         </div>
 
+       <!-- Message -->
+        <div id="staffMessage" class="mt-2 p-3 border border-yellow-400 bg-yellow-100 text-yellow-800 rounded">
+          If user role is set to <strong>Staff</strong>. After registraion please contact the administrator at 
+          administrator@stc.com for further steps.
+        </div>
+
         <!-- Submit Button -->
         <button type="submit" name="submit"
                 class="w-full py-2 px-4 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded shadow">
@@ -111,7 +116,9 @@
     </div>
   </main>
 
+<script src="displaystaffmessage.js"></script>
 <script src="javascripts/togglePassword.js"></script>
 {% include 'footer.html.twig' %}
+
 </body>
 </html>

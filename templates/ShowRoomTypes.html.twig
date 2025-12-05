@@ -4,31 +4,25 @@
     <meta charset="UTF-8">
     <title>{{ hotel.Hotel_Name }} - Room Types</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- used for weather and map api -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
-
 <body class="bg-gray-100 text-gray-800">
 
 {% include 'header.html.twig' with {'user': user} %}
-{% set nav_links = [
-    { 'href': 'index.php', 'text': 'Home' }
-] %}
+{% set nav_links = [{'href': 'index.php', 'text': 'Home'}] %}
 {% include 'navigationmenu.html.twig' with {'nav_links': nav_links, 'user': user} %}
 
 <div class="container mx-auto p-6">
     <h1 class="text-3xl font-bold mb-2">{{ hotel.Hotel_Name }}</h1>
     <p class="text-gray-600 mb-6">{{ hotel.Hotel_City_Name }}, {{ hotel.Hotel_Country_Name }}</p>
-
-    <h2 class="text-2xl font-semibold mb-3">Today Weather </h2>
+    <!-- weather forecast API -->
+    <h2 class="text-2xl font-semibold mb-3">Today Weather</h2>
     {% include 'weatherforecast.html.twig' with { hotel: hotel } %}
-
-    <!-- Map Section -->
+    <!-- MAP API -->
     {% if hotel.Latitude and hotel.Longitude %}
-         <h2 class="text-2xl font-semibold mb-3">Hotel Location</h2>
+        <h2 class="text-2xl font-semibold mb-3">Hotel Location</h2>
         <div id="hotel-map" class="w-full h-64 rounded-lg shadow-lg mb-6"></div>
-        
         <script>
             window.HOTEL_DATA = {
                 lat: {{ hotel.Latitude }},
@@ -36,77 +30,41 @@
                 name: "{{ hotel.Hotel_Name|e('js') }}"
             };
         </script>
-
         <script src="javascripts/mapApi.js"></script>
     {% endif %}
 
-    <!--Grouping rooms according to their type 
-        retrieve their details 
-        rettrieve available images to be displayed later -->
+    <!-- Room cards with carousel -->
     <h2 class="text-2xl font-semibold mb-4">Available Room Types</h2>
-    {% set room_types = {'Standard': [], 'Deluxe': [], 'Suite': []} %}
-    {% for room in roomTypes %}
-        {% set images = [room.Image1, room.Image2, room.Image3]|filter(v => v) %}
-        {% if images %}
-            {% set room_types = room_types|merge({
-                (room.Room_Type): room_types[room.Room_Type]|merge([{
-                    'Room_Id': room.Room_Id,
-                    'Bed_Type': room.Bed_Type,
-                    'Size': room.Room_Square_Meter,
-                    'Price': room.Price,
-                    'Images': images
-                }])
-            }) %}
-        {% endif %}
-    {% endfor %}
-    
-    <!--Display one available room of each type in the card layout
-        Display room images in a carousel
-        Display room  details
-        Create a booking button for loggedin users or a login button for not logged users.
-    -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {% for type, rooms in room_types %}
-            {% if rooms %}
-                {% set all_images = [] %}
-                {% for room in rooms %}
-                    {% set all_images = all_images|merge(room.Images) %}
-                {% endfor %}
 
+        {% for type in ['Standard', 'Deluxe', 'Suite'] %}
+            {% set room = roomTypes|filter(r => r.Room_Type == type)|first %}
+            {% set first_room = room.available_rooms[0] ?? null %}
+            {% if first_room %}
+                {% set images = [room.Image1, room.Image2, room.Image3]|filter(v => v) %}
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                     <h3 class="text-xl font-bold p-4">{{ type }} Room</h3>
-
-                    {% if all_images %}
+                    {% if images %}
                         <div class="relative w-full overflow-hidden">
-                            <div id="carousel-{{ type }}" class="flex transition-transform duration-500">
-                                {% for img in all_images %}
+                            <div id="carousel-{{ type|lower }}" class="flex transition-transform duration-500">
+                                {% for img in images %}
                                     <img src="{{ img }}" class="w-full h-48 object-cover flex-shrink-0" alt="{{ type }} Image">
                                 {% endfor %}
                             </div>
-                            {% if all_images|length > 1 %}
-                                <button data-carousel="{{ type }}" data-action="prev" class="absolute top-1/2 left-2 -translate-y-1/2 bg-white/70 px-3 py-1 rounded shadow">‹</button>
-                                <button data-carousel="{{ type }}" data-action="next" class="absolute top-1/2 right-2 -translate-y-1/2 bg-white/70 px-3 py-1 rounded shadow">›</button>
-                            {% endif %}
                         </div>
                     {% else %}
                         <div class="h-48 w-full flex items-center justify-center bg-gray-200 text-gray-500">
                             No images available
                         </div>
                     {% endif %}
-
                     <div class="p-4">
-                        <p class="text-gray-700 mb-1"><strong>Bed Type:</strong> {{ rooms[0].Bed_Type }}</p>
-                        <p class="text-gray-700 mb-1"><strong>Size:</strong> {{ rooms[0].Size }} m²</p>
-                        <p class="text-gray-700 mb-1"><strong>Price per night:</strong> €{{ rooms[0].Price }}</p>
-
-                        {% set room_type_data = roomTypes|filter(r => r.Room_Type == type)|first %}
-                        {% set first_room = room_type_data.available_rooms[0] ?? null %}
-
-                        {% if first_room %}
-                            <p class="text-gray-700 mb-1"><strong>Room Number:</strong> {{ first_room.Room_Number }}</p>
-                        {% else %}
-                            <p class="text-red-600 font-semibold">{{ room_type_data.no_rooms_message }}</p>
-                        {% endif %}
+                        <p><strong>Bed Type:</strong> {{ room.Bed_Type }}</p>
+                        <p><strong>Size:</strong> {{ room.Room_Square_Meter }} m²</p>
+                        <p><strong>Price per night:</strong> €{{ room.Price }}</p>
+                        <p><strong>Room Number:</strong> {{ first_room.Room_Number }}</p>
+                        
+                        {% set city_val = city|default('') %}
+                        {% set star_val = star_rating|default('') %}
 
                         {% if user %}
                             <form method="POST" action="booking.php">
@@ -115,29 +73,23 @@
                                 <input type="hidden" name="check_in" value="{{ check_in }}">
                                 <input type="hidden" name="check_out" value="{{ check_out }}">
                                 <input type="hidden" name="country" value="{{ country }}">
-                                <input type="hidden" name="city" value="{{ city }}">
-                                <input type="hidden" name="star_rating" value="{{ star_rating }}">
-
+                                <input type="hidden" name="city" value="{{ city_val }}">
+                                <input type="hidden" name="star_rating" value="{{ star_val }}">
                                 <button type="submit" class="w-full md:w-auto px-4 py-2 rounded bg-[#D4AF37] text-black font-semibold hover:bg-[#B9972B] mt-2">
                                     Book {{ type }} Room
                                 </button>
                             </form>
                         {% else %}
-                            {% if first_room %}
-                                <a href="login.php?hotel_id={{ hotel.Hotel_Id }}&room_id={{ first_room.Room_Id }}&check_in={{ check_in }}&check_out={{ check_out }}&country={{ country }}&city={{ city }}&star_rating={{ star_rating }}"
-                                   class="w-full md:w-auto inline-block text-center px-4 py-2 rounded bg-[#D4AF37] text-black font-semibold hover:bg-[#B9972B] mt-2">
-                                    Login to Book
-                                </a>
-                            {% else %}
-                                <span class="w-full md:w-auto inline-block text-center px-4 py-2 rounded bg-gray-400 text-white font-semibold mt-2">
-                                    No rooms available
-                                </span>
-                            {% endif %}
+                            <a href="login.php?hotel_id={{ hotel.Hotel_Id }}&room_id={{ first_room.Room_Id }}&check_in={{ check_in }}&check_out={{ check_out }}&country={{ country }}&city={{ city_val }}&star_rating={{ star_val }}"
+                               class="w-full md:w-auto inline-block text-center px-4 py-2 rounded bg-[#D4AF37] text-black font-semibold hover:bg-[#B9972B] mt-2">
+                                Login to Book
+                            </a>
                         {% endif %}
                     </div>
                 </div>
             {% endif %}
         {% endfor %}
+
     </div>
 </div>
 
